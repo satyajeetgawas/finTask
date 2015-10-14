@@ -3,4 +3,6 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="add_evernote">Add Evernote Account</string>
+    <string name="label_login">Login with Evernote</string>
 </resources>
