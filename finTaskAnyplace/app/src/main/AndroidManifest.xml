@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.appmagnet.fintaskanyplace" >
-
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <application
         android:name=".initializer.Initializer"
         android:allowBackup="true"
@@ -9,7 +12,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".activity.LoginActivity"
+            android:name=".activity.MainActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -17,9 +20,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.MainActivity"/>
+        <activity android:name=".activity.EvernoteLoginActivity"/>
         <activity android:name="com.evernote.client.android.EvernoteOAuthActivity" />
         <activity android:name="com.evernote.client.android.login.EvernoteLoginActivity"/>
+    <!-- Broadcast receiver -->
+    <receiver   android:name=".backgroundtasks.BackgroundTaskReceiver"></receiver>
     </application>
+
 
 </manifest>
