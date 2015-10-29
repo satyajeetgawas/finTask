@@ -7,12 +7,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.PowerManager;
+import android.text.TextUtils;
 import android.widget.Toast;
 
+import com.appmagnet.fintaskanyplace.initializer.LocationHandler;
 import com.appmagnet.fintaskanyplace.yelp.YelpAPI;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.text.Format;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -38,13 +45,40 @@ public class BackgroundTaskReceiver extends BroadcastReceiver {
             @Override
                          public void run() {
                 YelpAPI yelpApi = new YelpAPI();
-                yelpQuery[0] = yelpApi.searchForBusinessesByLocation("groceries", "Atlanta,GA");
+                LocationHandler lh = LocationHandler.getInstance();
+                if(!lh.isLocationEnabled()){
+                    return;
+                }
+                String location = lh.getLocationMap().get(LocationHandler.LATITUDE).toString();
+                location +=",";
+                location += lh.getLocationMap().get(LocationHandler.LONGITUDE).toString();
+                yelpQuery[0] = yelpApi.searchForBusinessesByLocation("groceries", location);
             }
         });
         thread.start();
         while(thread.isAlive());
+        ArrayList<String> businessNames=null;
+        try{
+            JSONObject json = new JSONObject(yelpQuery[0]);
+            JSONArray businesses = json.getJSONArray("businesses");
+            businessNames = new ArrayList<String>(businesses.length());
+            for (int i = 0; i < businesses.length(); i++) {
+                JSONObject business = businesses.getJSONObject(i);
+                Double rating  = business.getDouble("rating");
+                if(rating>3.5)
+                    businessNames.add(business.getString("name")+", "+rating.toString());
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
-        Toast.makeText(context, yelpQuery[0], Toast.LENGTH_LONG).show();
+    if(businessNames!=null){
+        String businessesCon =  TextUtils.join("\n", businessNames);
+        Toast.makeText(context, businessesCon, Toast.LENGTH_LONG).show();
+    }
+
+
+
 
         //Release the lock
         wl.release();

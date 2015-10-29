@@ -20,6 +20,7 @@ import java.util.Map;
  */
 public class LocationHandler implements LocationListener{
 
+    private static LocationHandler instance = null;
     public static final String LATITUDE = "LATITUDE";
     public static final String LONGITUDE = "LONGITUDE";
     protected LocationManager locationManager;
@@ -36,7 +37,11 @@ public class LocationHandler implements LocationListener{
         else{
             isLocationEnabled = false;
         }
+        instance = this;
+    }
 
+    public static LocationHandler getInstance(){
+        return instance;
     }
 
     public boolean isLocationEnabled(){
