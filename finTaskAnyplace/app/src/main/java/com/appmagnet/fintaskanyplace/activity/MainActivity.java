@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.appmagnet.fintaskanyplace.R;
 import com.appmagnet.fintaskanyplace.backgroundtasks.BackgroundTaskReceiver;
 import com.appmagnet.fintaskanyplace.evernote.ReadUserNotes;
+import com.appmagnet.fintaskanyplace.googleservices.CalendarLogin;
 import com.appmagnet.fintaskanyplace.initializer.LocationHandler;
 import com.evernote.client.android.EvernoteSession;
 import com.evernote.edam.type.User;
@@ -38,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
             // LoginChecker will call finish
             return;
         }
+        Intent intent = new Intent(getBaseContext(), CalendarLogin.class);
+        startActivity(intent);
         backgroundTaskReceiver = new BackgroundTaskReceiver();
         Context context = this.getApplicationContext();
         backgroundTaskReceiver.doInBackground(context);
@@ -68,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
                 locHandle.getLocationMap().get(LocationHandler.LONGITUDE);
         Toast.makeText(getApplicationContext(), loc, Toast.LENGTH_LONG).show();
 
+
         while (thread.isAlive()) ;
         if (namesList.size() > 0) {
             String noteNames = TextUtils.join(", ", namesList);
@@ -75,6 +79,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+
+
 
     private void showLocationEnableDialog(){
         // Build the alert dialog

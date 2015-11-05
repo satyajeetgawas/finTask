@@ -15,10 +15,10 @@ import com.evernote.client.android.login.EvernoteLoginFragment;
 /**
  * @author rwondratschek
  */
-public class EvernoteLoginActivity extends AppCompatActivity implements EvernoteLoginFragment.ResultCallback {
+public class LoginActivity extends AppCompatActivity implements EvernoteLoginFragment.ResultCallback {
 
     public static void launch(Activity activity) {
-        activity.startActivity(new Intent(activity, EvernoteLoginActivity.class));
+        activity.startActivity(new Intent(activity, LoginActivity.class));
     }
 
     private Button mButton;
@@ -32,7 +32,7 @@ public class EvernoteLoginActivity extends AppCompatActivity implements Evernote
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                EvernoteSession.getInstance().authenticate(EvernoteLoginActivity.this);
+                EvernoteSession.getInstance().authenticate(LoginActivity.this);
                 mButton.setEnabled(false);
             }
         });

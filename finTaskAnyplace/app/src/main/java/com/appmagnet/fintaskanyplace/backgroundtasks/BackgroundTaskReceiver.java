@@ -46,30 +46,40 @@ public class BackgroundTaskReceiver extends BroadcastReceiver {
                          public void run() {
                 YelpAPI yelpApi = new YelpAPI();
                 LocationHandler lh = LocationHandler.getInstance();
+                if(lh==null) return;
                 if(!lh.isLocationEnabled()){
                     return;
                 }
-                String location = lh.getLocationMap().get(LocationHandler.LATITUDE).toString();
-                location +=",";
-                location += lh.getLocationMap().get(LocationHandler.LONGITUDE).toString();
-                yelpQuery[0] = yelpApi.searchForBusinessesByLocation("groceries", location);
+
+               if(lh.getLocationMap().get(LocationHandler.LATITUDE)!=null){
+                   String location;
+                   location=lh.getLocationMap().get(LocationHandler.LATITUDE) .toString();
+                   location +=",";
+                   location += lh.getLocationMap().get(LocationHandler.LONGITUDE).toString();
+                   yelpQuery[0] = yelpApi.searchForBusinessesByLocation("groceries", location);
+               }
+
+
+
             }
         });
         thread.start();
         while(thread.isAlive());
         ArrayList<String> businessNames=null;
-        try{
-            JSONObject json = new JSONObject(yelpQuery[0]);
-            JSONArray businesses = json.getJSONArray("businesses");
-            businessNames = new ArrayList<String>(businesses.length());
-            for (int i = 0; i < businesses.length(); i++) {
-                JSONObject business = businesses.getJSONObject(i);
-                Double rating  = business.getDouble("rating");
-                if(rating>3.5)
-                    businessNames.add(business.getString("name")+", "+rating.toString());
+        if(yelpQuery[0]!=null) {
+            try {
+                JSONObject json = new JSONObject(yelpQuery[0]);
+                JSONArray businesses = json.getJSONArray("businesses");
+                businessNames = new ArrayList<String>(businesses.length());
+                for (int i = 0; i < businesses.length(); i++) {
+                    JSONObject business = businesses.getJSONObject(i);
+                    Double rating = business.getDouble("rating");
+                    if (rating > 3.5)
+                        businessNames.add(business.getString("name") + ", " + rating.toString());
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
         }
 
     if(businessNames!=null){

@@ -51,12 +51,14 @@ public class LocationHandler implements LocationListener{
     public Map<String,Double> getLocationMap(){
         locMap = new HashMap<String,Double>();
         Location l = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        if(null != l){
-            locMap.put(LATITUDE, l.getLatitude());
-            locMap.put(LONGITUDE, l.getLongitude());
+        if(null == l){
+            l = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
         }
-
-        return locMap;
+       if(l!=null){
+           locMap.put(LATITUDE, l.getLatitude());
+           locMap.put(LONGITUDE, l.getLongitude());
+       }
+      return locMap;
     }
 
 

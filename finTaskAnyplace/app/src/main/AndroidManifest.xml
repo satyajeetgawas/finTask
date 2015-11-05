@@ -5,6 +5,10 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
     <application
         android:name=".initializer.Initializer"
         android:allowBackup="true"
@@ -20,10 +24,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.EvernoteLoginActivity"/>
-        <activity android:name="com.evernote.client.android.EvernoteOAuthActivity" />
-        <activity android:name="com.evernote.client.android.login.EvernoteLoginActivity"/>
-    <!-- Broadcast receiver -->
+        <activity android:name=".activity.LoginActivity"/>
+        <activity android:name=".googleservices.CalendarLogin"/>
+        <!-- Broadcast receiver -->
     <receiver   android:name=".backgroundtasks.BackgroundTaskReceiver"></receiver>
     </application>
 
