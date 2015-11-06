@@ -9,6 +9,8 @@ import android.provider.Settings;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,6 +21,8 @@ import com.appmagnet.fintaskanyplace.googleservices.CalendarLogin;
 import com.appmagnet.fintaskanyplace.initializer.LocationHandler;
 import com.evernote.client.android.EvernoteSession;
 import com.evernote.edam.type.User;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,12 +39,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
 
-        if (!EvernoteSession.getInstance().isLoggedIn()) {
-            // LoginChecker will call finish
-            return;
+        if(!EvernoteSession.getInstance().isLoggedIn()||isGooglePlayServicesAvailable() )
+        {
+           return;
         }
-        Intent intent = new Intent(getBaseContext(), CalendarLogin.class);
-        startActivity(intent);
+        // Intent intent = new Intent(getBaseContext(), CalendarLogin.class);
+        //startActivity(intent);
         backgroundTaskReceiver = new BackgroundTaskReceiver();
         Context context = this.getApplicationContext();
         backgroundTaskReceiver.doInBackground(context);
@@ -101,14 +105,32 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
+    public boolean onOptionsItemSelected(MenuItem item){
+        int id = item.getItemId();
+
+        if(id==R.id.action_settings){
+            Intent intent = new Intent(this,SettingsActivity.class);
+            startActivity(intent);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
-    protected void onResume(){
-        super.onResume();
+    public boolean onCreateOptionsMenu(Menu menu){
+        getMenuInflater().inflate(R.menu.menu_fin_task_anyplace,menu);
+        return true;
     }
 
+    private boolean isGooglePlayServicesAvailable() {
+        final int connectionStatusCode =
+                GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+        if (GooglePlayServicesUtil.isUserRecoverableError(connectionStatusCode)) {
+            return false;
+        } else if (connectionStatusCode != ConnectionResult.SUCCESS ) {
+            return false;
+        }
+        return true;
+    }
 
 }

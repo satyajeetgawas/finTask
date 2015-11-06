@@ -2,12 +2,12 @@ package com.appmagnet.fintaskanyplace.initializer;
 
 
 import android.app.Application;
+
+import com.appmagnet.fintaskanyplace.util.ApiKeys;
 import com.evernote.client.android.EvernoteSession;
 
 public class Initializer extends Application {
 
-    private static final String CONSUMER_KEY = "satya-5228";
-    private static final String CONSUMER_SECRET = "bfd65c66026815fb";
     private static final EvernoteSession.EvernoteService EVERNOTE_SERVICE = EvernoteSession.EvernoteService.SANDBOX;
     private static final boolean SUPPORT_APP_LINKED_NOTEBOOKS = true;
     @Override
@@ -19,7 +19,7 @@ public class Initializer extends Application {
                 .setSupportAppLinkedNotebooks(SUPPORT_APP_LINKED_NOTEBOOKS)
                 .setForceAuthenticationInThirdPartyApp(true)
 //                .setLocale(Locale.SIMPLIFIED_CHINESE)
-                .build(CONSUMER_KEY, CONSUMER_SECRET)
+                .build(ApiKeys.EVERNOTE_CONSUMER_KEY, ApiKeys.EVERNOTE_CONSUMER_SECRET)
                 .asSingleton();
 
         registerActivityLifecycleCallbacks(new LoginChecker());

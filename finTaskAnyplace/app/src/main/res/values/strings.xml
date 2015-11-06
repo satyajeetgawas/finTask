@@ -5,4 +5,9 @@
     <string name="action_settings">Settings</string>
     <string name="add_evernote">Add Evernote Account</string>
     <string name="label_login">Login with Evernote</string>
+    <string name="evernote">Evernote</string>
+    <string name="google_calendar">Google Calendar</string>
+    <string name="yelp">Yelp</string>
+    <string name="google_places">Google Places</string>
+    <string name="add_accounts">Add Accounts to Sync</string>
 </resources>
