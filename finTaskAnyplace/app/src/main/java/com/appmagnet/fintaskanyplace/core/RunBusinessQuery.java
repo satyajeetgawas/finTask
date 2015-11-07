@@ -32,7 +32,7 @@ public class RunBusinessQuery extends AsyncTask<Context, Void, ArrayList<Busines
         }
         if (businessNames != null) {
             String businessesCon = TextUtils.join("\n", businessNames);
-            Toast.makeText(context, businessesCon, Toast.LENGTH_LONG).show();
+          //  Toast.makeText(context, businessesCon, Toast.LENGTH_LONG).show();
         }
     }
 
@@ -56,8 +56,8 @@ public class RunBusinessQuery extends AsyncTask<Context, Void, ArrayList<Busines
              */
                 String term = "grocery_or_supermarket"; //this term will be obtained from the saved(cached) file which is
                 //generated or refreshed once daily
-                listOfBusinesses.addAll(yelpApi.searchForBusinessesByLocation(term, location));
-                listOfBusinesses.addAll(googlePlaces.searchForBusinessesByLocation(term, location));
+               // listOfBusinesses.addAll(yelpApi.searchForBusinessesByLocation(term, location));
+                //listOfBusinesses.addAll(googlePlaces.searchForBusinessesByLocation(term, location));
             }
         }
         return listOfBusinesses;

@@ -22,9 +22,6 @@ public class Initializer extends Application {
                 .build(ApiKeys.EVERNOTE_CONSUMER_KEY, ApiKeys.EVERNOTE_CONSUMER_SECRET)
                 .asSingleton();
 
-        registerActivityLifecycleCallbacks(new LoginChecker());
+
     }
-
-
-
 }

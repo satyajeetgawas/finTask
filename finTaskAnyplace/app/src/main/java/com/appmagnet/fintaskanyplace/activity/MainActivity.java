@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v7.app.AlertDialog;
@@ -19,6 +20,7 @@ import com.appmagnet.fintaskanyplace.backgroundtasks.BackgroundTaskReceiver;
 import com.appmagnet.fintaskanyplace.evernote.ReadUserNotes;
 import com.appmagnet.fintaskanyplace.googleservices.CalendarLogin;
 import com.appmagnet.fintaskanyplace.initializer.LocationHandler;
+import com.appmagnet.fintaskanyplace.util.Util;
 import com.evernote.client.android.EvernoteSession;
 import com.evernote.edam.type.User;
 import com.google.android.gms.common.ConnectionResult;
@@ -32,31 +34,91 @@ import java.util.List;
  */
 public class MainActivity extends AppCompatActivity {
 
-    LocationHandler locHandle;
+    private LocationHandler locHandle;
+    private boolean createFirst;
+
     public BackgroundTaskReceiver backgroundTaskReceiver;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
 
-        if(!EvernoteSession.getInstance().isLoggedIn()||isGooglePlayServicesAvailable() )
-        {
-           return;
-        }
-        // Intent intent = new Intent(getBaseContext(), CalendarLogin.class);
-        //startActivity(intent);
+        createFirst = true;
+
         backgroundTaskReceiver = new BackgroundTaskReceiver();
         Context context = this.getApplicationContext();
         backgroundTaskReceiver.doInBackground(context);
 
+        checkAndInitializeRrerequisites();
+
+
+
+        // Intent intent = new Intent(getBaseContext(), CalendarLogin.class);
+        //startActivity(intent);
+
+//        String loc = "Latitude " + locHandle.getLocationMap().get(LocationHandler.LATITUDE) + " Longitude " +
+//                locHandle.getLocationMap().get(LocationHandler.LONGITUDE);
+//        Toast.makeText(getApplicationContext(), loc, Toast.LENGTH_LONG).show();
+
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        if(!createFirst)
+            checkAndInitializeRrerequisites();
+        createFirst = false;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        getMenuInflater().inflate(R.menu.menu_fin_task_anyplace, menu);
+        return true;
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        int id = item.getItemId();
+
+        if(id==R.id.action_settings){
+            startSettingsActivity();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
+
+    private void checkAndInitializeRrerequisites() {
+        locHandle= new LocationHandler(this);
+
+        if (!Boolean.valueOf(Util.getSettings(this, Util.EVERNOTE_USER_PREF)))
+        {
+           showEnableAtleastOneAccout();
+        }
+
+        else if (!locHandle.isLocationEnabled()) {
+           showLocationEnableDialog();
+        }
+        else
+            showTaskList();
+
+
+    }
+
+
+    private void showTaskList() {
+
         final List<String> namesList = new ArrayList<>();
         //--Set guid of notebook to only retrieve notes for the current notebok
-        Thread thread = new Thread(new Runnable(){
+        Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
                 ReadUserNotes userNotes = new ReadUserNotes();
-                if(userNotes.queryNotesGuid()){
-                    if(userNotes.queryNotesRawData()){
+                if (userNotes.queryNotesGuid()) {
+                    if (userNotes.queryNotesRawData()) {
                         namesList.addAll(userNotes.processRawNoteData());
                     }
                 }
@@ -65,25 +127,30 @@ public class MainActivity extends AppCompatActivity {
         });
 
         thread.start();
-        boolean isLocationDisabled = true;
-        locHandle= new LocationHandler(this);
-        if (!locHandle.isLocationEnabled()) {
-            showLocationEnableDialog();
-        }
-
-        String loc = "Latitude " + locHandle.getLocationMap().get(LocationHandler.LATITUDE) + " Longitude " +
-                locHandle.getLocationMap().get(LocationHandler.LONGITUDE);
-        Toast.makeText(getApplicationContext(), loc, Toast.LENGTH_LONG).show();
-
 
         while (thread.isAlive()) ;
         if (namesList.size() > 0) {
             String noteNames = TextUtils.join(", ", namesList);
             Toast.makeText(getApplicationContext(), "" + noteNames + " notes have been retrieved", Toast.LENGTH_LONG).show();
         }
-
     }
 
+
+
+    private void showEnableAtleastOneAccout() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Services Not Active");
+        builder.setMessage("Please enable atleast one Service");
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialogInterface, int i) {
+                // Show location settings when the user acknowledges the alert dialog
+                startSettingsActivity();
+            }
+        });
+        Dialog alertDialog = builder.create();
+        alertDialog.setCanceledOnTouchOutside(false);
+        alertDialog.show();
+    }
 
 
     private void showLocationEnableDialog(){
@@ -104,23 +171,13 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item){
-        int id = item.getItemId();
 
-        if(id==R.id.action_settings){
-            Intent intent = new Intent(this,SettingsActivity.class);
-            startActivity(intent);
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
+
+    private void startSettingsActivity(){
+        Intent intent = new Intent(this,SettingsActivity.class);
+        startActivity(intent);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu){
-        getMenuInflater().inflate(R.menu.menu_fin_task_anyplace,menu);
-        return true;
-    }
 
     private boolean isGooglePlayServicesAvailable() {
         final int connectionStatusCode =

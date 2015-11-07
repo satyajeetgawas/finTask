@@ -24,7 +24,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.LoginActivity"/>
         <activity android:name=".googleservices.CalendarLogin"/>
         <activity android:name=".activity.SettingsActivity"
             android:label="@string/action_settings" />

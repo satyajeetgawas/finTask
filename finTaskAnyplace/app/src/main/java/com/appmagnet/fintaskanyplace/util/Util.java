@@ -3,7 +3,6 @@ package com.appmagnet.fintaskanyplace.util;
 import android.app.Activity;
 import android.content.SharedPreferences;
 
-import com.appmagnet.fintaskanyplace.activity.LoginActivity;
 import com.evernote.client.android.EvernoteSession;
 
 /**
@@ -31,7 +30,6 @@ public final class Util {
 
     public static void logout(Activity activity) {
         EvernoteSession.getInstance().logOut();
-        LoginActivity.launch(activity);
         activity.finish();
     }
 

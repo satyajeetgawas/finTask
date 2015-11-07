@@ -1,6 +1,5 @@
 package com.appmagnet.fintaskanyplace.activity;
 
-import android.app.Application;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -8,8 +7,6 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 
 import com.appmagnet.fintaskanyplace.R;
-import com.appmagnet.fintaskanyplace.initializer.LoginChecker;
-import com.appmagnet.fintaskanyplace.util.ApiKeys;
 import com.appmagnet.fintaskanyplace.util.Util;
 import com.evernote.client.android.EvernoteSession;
 import com.google.android.gms.common.ConnectionResult;
@@ -28,6 +25,7 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_settings);
 
         Switch evernoteSwitch = (Switch) findViewById(R.id.switch_evernote);
+        evernoteSwitch.setChecked(false);
         if(EvernoteSession.getInstance()!=null)
             evernoteSwitch.setChecked(EvernoteSession.getInstance().isLoggedIn());
 
@@ -35,6 +33,7 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 setSetting(Util.EVERNOTE_USER_PREF, isChecked);
+                evernoteLogin();
             }
         });
 
@@ -64,6 +63,10 @@ public class SettingsActivity extends AppCompatActivity {
                 setSetting(Util.GOOGLE_PLACES_PREF,isChecked);
             }
         });
+    }
+
+    private void evernoteLogin() {
+        EvernoteSession.getInstance().authenticate(this);
     }
 
     private void setSetting(String key,boolean isChecked) {
