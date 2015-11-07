@@ -4,7 +4,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v7.app.AlertDialog;
@@ -12,17 +11,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.appmagnet.fintaskanyplace.R;
 import com.appmagnet.fintaskanyplace.backgroundtasks.BackgroundTaskReceiver;
 import com.appmagnet.fintaskanyplace.evernote.ReadUserNotes;
-import com.appmagnet.fintaskanyplace.googleservices.CalendarLogin;
 import com.appmagnet.fintaskanyplace.initializer.LocationHandler;
 import com.appmagnet.fintaskanyplace.util.Util;
-import com.evernote.client.android.EvernoteSession;
-import com.evernote.edam.type.User;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
@@ -49,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
         Context context = this.getApplicationContext();
         backgroundTaskReceiver.doInBackground(context);
 
-        checkAndInitializeRrerequisites();
+        checkAndInitializePrerequisites();
 
 
 
@@ -67,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
 
         if(!createFirst)
-            checkAndInitializeRrerequisites();
+            checkAndInitializePrerequisites();
         createFirst = false;
     }
 
@@ -91,12 +86,12 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    private void checkAndInitializeRrerequisites() {
+    private void checkAndInitializePrerequisites() {
         locHandle= new LocationHandler(this);
 
         if (!Boolean.valueOf(Util.getSettings(this, Util.EVERNOTE_USER_PREF)))
         {
-           showEnableAtleastOneAccout();
+           showEnableAtleastOneAccount();
         }
 
         else if (!locHandle.isLocationEnabled()) {
@@ -137,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    private void showEnableAtleastOneAccout() {
+    private void showEnableAtleastOneAccount() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Services Not Active");
         builder.setMessage("Please enable atleast one Service");
@@ -170,7 +165,6 @@ public class MainActivity extends AppCompatActivity {
         alertDialog.show();
 
     }
-
 
 
     private void startSettingsActivity(){

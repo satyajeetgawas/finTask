@@ -27,13 +27,14 @@ public class SettingsActivity extends AppCompatActivity {
         Switch evernoteSwitch = (Switch) findViewById(R.id.switch_evernote);
         evernoteSwitch.setChecked(false);
         if(EvernoteSession.getInstance()!=null)
-            evernoteSwitch.setChecked(EvernoteSession.getInstance().isLoggedIn());
-
+            //evernoteSwitch.setChecked(EvernoteSession.getInstance().isLoggedIn());
+            //if(!EvernoteSession.getInstance().isLoggedIn() )
         evernoteSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 setSetting(Util.EVERNOTE_USER_PREF, isChecked);
-                evernoteLogin();
+                if(isChecked && !EvernoteSession.getInstance().isLoggedIn())
+                    evernoteLogin();
             }
         });
 
