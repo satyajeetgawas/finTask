@@ -1,8 +1,13 @@
 package com.appmagnet.fintaskanyplace.activity;
 
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 
@@ -18,17 +23,31 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 public class SettingsActivity extends AppCompatActivity {
     private static final EvernoteSession.EvernoteService EVERNOTE_SERVICE = EvernoteSession.EvernoteService.SANDBOX;
     private static final boolean SUPPORT_APP_LINKED_NOTEBOOKS = true;
-
+    private static float dX, dY;
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
+
         Switch evernoteSwitch = (Switch) findViewById(R.id.switch_evernote);
         evernoteSwitch.setChecked(false);
         if(EvernoteSession.getInstance()!=null)
-            //evernoteSwitch.setChecked(EvernoteSession.getInstance().isLoggedIn());
-            //if(!EvernoteSession.getInstance().isLoggedIn() )
+            evernoteSwitch.setChecked(EvernoteSession.getInstance().isLoggedIn());
+            if(EvernoteSession.getInstance().isLoggedIn()) {
+                Button evernoteButton = (Button) findViewById(R.id.logout_evernote);
+                evernoteButton.setEnabled(true);
+                evernoteButton.setClickable(true);
+                evernoteButton.setAlpha(1f);
+                evernoteButton.setBackgroundColor(Color.GRAY);
+
+            } else {
+                Button evernoteButton = (Button) findViewById(R.id.logout_evernote);
+                evernoteButton.setEnabled(false);
+                evernoteButton.setClickable(false);
+                evernoteButton.setAlpha(.5f);
+                evernoteButton.setBackgroundColor(Color.DKGRAY);
+            }
         evernoteSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -68,10 +87,17 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void evernoteLogin() {
         EvernoteSession.getInstance().authenticate(this);
+        Button evernoteButton = (Button) findViewById(R.id.logout_evernote);
+        evernoteButton.setEnabled(true);
+        evernoteButton.setClickable(true);
+        evernoteButton.setAlpha(1f);
+        evernoteButton.setBackgroundColor(Color.GRAY);
+        // Enable the Logout from Evernote Button
+
     }
 
     private void setSetting(String key,boolean isChecked) {
-        Util.setUserSetting(this,key,String.valueOf(isChecked));
+        Util.setUserSetting(this, key, String.valueOf(isChecked));
     }
 
 
@@ -89,6 +115,45 @@ public class SettingsActivity extends AppCompatActivity {
             return false;
         } else if (connectionStatusCode != ConnectionResult.SUCCESS ) {
             return false;
+        }
+        return true;
+    }
+
+    public void logoutEvernote() {
+        if(EvernoteSession.getInstance()!=null) {
+                if(EvernoteSession.getInstance().isLoggedIn()) {
+                    Button evernoteButton = (Button) findViewById(R.id.logout_evernote);
+                    evernoteButton.setEnabled(false);
+                    evernoteButton.setAlpha(.5f);
+                    evernoteButton.setClickable(false);
+                    evernoteButton.setBackgroundColor(Color.DKGRAY);
+                    // logout from evernote
+                    // disable the switch
+                }
+        }
+    }
+
+
+    public boolean onTouch(View view, MotionEvent event) {
+
+        switch (event.getActionMasked()) {
+
+            case MotionEvent.ACTION_DOWN:
+
+                dX = view.getX() - event.getRawX();
+                dY = view.getY() - event.getRawY();
+                break;
+
+            case MotionEvent.ACTION_MOVE:
+
+                view.animate()
+                        .x(event.getRawX() + dX)
+                        .y(event.getRawY() + dY)
+                        .setDuration(0)
+                        .start();
+                break;
+            default:
+                return false;
         }
         return true;
     }

@@ -10,4 +10,9 @@
     <string name="yelp">Yelp</string>
     <string name="google_places">Google Places</string>
     <string name="add_accounts">Add Accounts to Sync</string>
+    <string name="radius">Radius</string>
+    <string name="refresh_rate">Notification Update Frequency</string>
+    <string name="logout_accounts">Logout from Accounts</string>
+    <string name="logout_evernote">Logout from Evernote</string>
+    <string name="logout_calender">Logout from Google Calender</string>
 </resources>

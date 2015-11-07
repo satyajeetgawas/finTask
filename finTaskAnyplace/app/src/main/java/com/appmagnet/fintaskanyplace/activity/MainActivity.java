@@ -51,9 +51,9 @@ public class MainActivity extends AppCompatActivity {
         // Intent intent = new Intent(getBaseContext(), CalendarLogin.class);
         //startActivity(intent);
 
-//        String loc = "Latitude " + locHandle.getLocationMap().get(LocationHandler.LATITUDE) + " Longitude " +
-//                locHandle.getLocationMap().get(LocationHandler.LONGITUDE);
-//        Toast.makeText(getApplicationContext(), loc, Toast.LENGTH_LONG).show();
+        //String loc = "Latitude " + locHandle.getLocationMap().get(LocationHandler.LATITUDE) + " Longitude " +
+        //        locHandle.getLocationMap().get(LocationHandler.LONGITUDE);
+        //Toast.makeText(getApplicationContext(), loc, Toast.LENGTH_LONG).show();
 
     }
 
