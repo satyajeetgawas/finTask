@@ -22,7 +22,7 @@ public class BackgroundTaskReceiver extends BroadcastReceiver {
         PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "YOUR TAG");
         //Acquire the lock
         wl.acquire();
-        new RunBusinessQuery().execute(context);
+       // new RunBusinessQuery().execute(context);
         //Release the lock
         wl.release();
     }

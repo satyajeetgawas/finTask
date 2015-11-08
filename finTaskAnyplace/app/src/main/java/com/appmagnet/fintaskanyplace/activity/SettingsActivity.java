@@ -32,29 +32,13 @@ public class SettingsActivity extends AppCompatActivity {
 
         Switch evernoteSwitch = (Switch) findViewById(R.id.switch_evernote);
         evernoteSwitch.setChecked(false);
-        if(EvernoteSession.getInstance()!=null)
-            evernoteSwitch.setChecked(EvernoteSession.getInstance().isLoggedIn());
-            if(EvernoteSession.getInstance().isLoggedIn()) {
-                Button evernoteButton = (Button) findViewById(R.id.logout_evernote);
-                evernoteButton.setEnabled(true);
-                evernoteButton.setClickable(true);
-                evernoteButton.setAlpha(1f);
-                evernoteButton.setBackgroundColor(Color.GRAY);
-
-            } else {
-                Button evernoteButton = (Button) findViewById(R.id.logout_evernote);
-                evernoteButton.setEnabled(false);
-                evernoteButton.setClickable(false);
-                evernoteButton.setAlpha(.5f);
-                evernoteButton.setBackgroundColor(Color.DKGRAY);
-            }
+        evernoteSwitch.setChecked(EvernoteSession.getInstance()!=null && EvernoteSession.getInstance().isLoggedIn() );
         evernoteSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 setSetting(Util.EVERNOTE_USER_PREF, isChecked);
-                if(isChecked && !EvernoteSession.getInstance().isLoggedIn())
-                    evernoteLogin();
-            }
+                evernoteLogin(isChecked);
+          }
         });
 
         Switch googleCalendarSwitch = (Switch) findViewById(R.id.switch_google_calendar);
@@ -85,14 +69,17 @@ public class SettingsActivity extends AppCompatActivity {
         });
     }
 
-    private void evernoteLogin() {
-        EvernoteSession.getInstance().authenticate(this);
-        Button evernoteButton = (Button) findViewById(R.id.logout_evernote);
-        evernoteButton.setEnabled(true);
-        evernoteButton.setClickable(true);
-        evernoteButton.setAlpha(1f);
-        evernoteButton.setBackgroundColor(Color.GRAY);
-        // Enable the Logout from Evernote Button
+    private void evernoteLogin(boolean isChecked) {
+        if(isChecked)
+            EvernoteSession.getInstance().authenticate(this);
+        else
+            Util.logout(this);
+//        Button evernoteButton = (Button) findViewById(R.id.logout_evernote);
+//        evernoteButton.setEnabled(true);
+//        evernoteButton.setClickable(true);
+//        evernoteButton.setAlpha(1f);
+//        evernoteButton.setBackgroundColor(Color.GRAY);
+//        // Enable the Logout from Evernote Button
 
     }
 

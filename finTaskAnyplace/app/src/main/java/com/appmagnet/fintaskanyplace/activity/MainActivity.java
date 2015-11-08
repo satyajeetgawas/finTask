@@ -18,6 +18,7 @@ import com.appmagnet.fintaskanyplace.backgroundtasks.BackgroundTaskReceiver;
 import com.appmagnet.fintaskanyplace.evernote.ReadUserNotes;
 import com.appmagnet.fintaskanyplace.initializer.LocationHandler;
 import com.appmagnet.fintaskanyplace.util.Util;
+import com.evernote.client.android.EvernoteSession;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
@@ -30,7 +31,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private LocationHandler locHandle;
-    private boolean createFirst;
+
 
     public BackgroundTaskReceiver backgroundTaskReceiver;
     @Override
@@ -38,13 +39,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
 
-        createFirst = true;
 
         backgroundTaskReceiver = new BackgroundTaskReceiver();
         Context context = this.getApplicationContext();
         backgroundTaskReceiver.doInBackground(context);
 
-        checkAndInitializePrerequisites();
+
 
 
 
@@ -60,10 +60,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onResume(){
         super.onResume();
-
-        if(!createFirst)
-            checkAndInitializePrerequisites();
-        createFirst = false;
+        checkAndInitializePrerequisites();
     }
 
     @Override
@@ -89,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
     private void checkAndInitializePrerequisites() {
         locHandle= new LocationHandler(this);
 
-        if (!Boolean.valueOf(Util.getSettings(this, Util.EVERNOTE_USER_PREF)))
+        if (EvernoteSession.getInstance()==null || !EvernoteSession.getInstance().isLoggedIn())
         {
            showEnableAtleastOneAccount();
         }
