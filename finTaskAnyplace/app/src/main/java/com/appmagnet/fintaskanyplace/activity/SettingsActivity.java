@@ -1,41 +1,58 @@
 package com.appmagnet.fintaskanyplace.activity;
 
-import android.graphics.Color;
-import android.graphics.PorterDuff;
+import android.accounts.AccountManager;
+import android.app.Dialog;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
-import android.view.MotionEvent;
-import android.view.View;
-import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
 
 import com.appmagnet.fintaskanyplace.R;
+import com.appmagnet.fintaskanyplace.util.Constants;
 import com.appmagnet.fintaskanyplace.util.Util;
 import com.evernote.client.android.EvernoteSession;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.util.ExponentialBackOff;
+
+import java.util.Arrays;
 
 /**
  * Created by satyajeet on 11/6/2015.
  */
 public class SettingsActivity extends AppCompatActivity {
-    private static final EvernoteSession.EvernoteService EVERNOTE_SERVICE = EvernoteSession.EvernoteService.SANDBOX;
-    private static final boolean SUPPORT_APP_LINKED_NOTEBOOKS = true;
-    private static float dX, dY;
+
+    GoogleAccountCredential mCredential;
+    static final int REQUEST_ACCOUNT_PICKER = 1000;
+    static final int REQUEST_AUTHORIZATION = 1001;
+    static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
     int radius, refresh_rate;
+    private Switch googleCalendarSwitch;
+
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+       resetSettings();
+    }
+
+    private void resetSettings(){
         TextView radius_text1 = (TextView) findViewById(R.id.radiusCurrentValueID);
-        String a = Util.getSettings(this, Util.PROXIMITY_RADIUS);
+        String a = Util.getSettings(this, Constants.PROXIMITY_RADIUS);
         if(a == "") {
             a = "0";
         }
@@ -44,7 +61,7 @@ public class SettingsActivity extends AppCompatActivity {
         seek_rad.setProgress(new Integer(a));
 
         TextView refresh_text1 = (TextView) findViewById(R.id.refreshCurrentValueID);
-        String b = Util.getSettings(this, Util.REFRESH_RATE);
+        String b = Util.getSettings(this, Constants.REFRESH_RATE);
         if(b == "") {
             b = "0";
         }
@@ -58,35 +75,34 @@ public class SettingsActivity extends AppCompatActivity {
         evernoteSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                setSetting(Util.EVERNOTE_USER_PREF, String.valueOf(isChecked));
                 evernoteLogin(isChecked);
             }
         });
 
-        Switch googleCalendarSwitch = (Switch) findViewById(R.id.switch_google_calendar);
-        googleCalendarSwitch.setChecked(isGooglePlayServicesAvailable());
+        googleCalendarSwitch = (Switch) findViewById(R.id.switch_google_calendar);
+        googleCalendarSwitch.setChecked(!"0".equals(Util.getSettings(this, Constants.PREF_ACCOUNT_NAME)));
         googleCalendarSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                setSetting(Util.GOOGLE_CALENDAR_PREF, String.valueOf(isChecked));
+                googleCalendarLogin(isChecked);
             }
         });
 
         Switch yelpApiSwitch = (Switch) findViewById(R.id.switch_yelp);
-        yelpApiSwitch.setChecked(Boolean.parseBoolean(Util.getSettings(this, Util.YELP_PREF)));
+        yelpApiSwitch.setChecked(Boolean.parseBoolean(Util.getSettings(this, Constants.YELP_PREF)));
         yelpApiSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                setSetting(Util.YELP_PREF, String.valueOf(isChecked));
+                setSetting(Constants.YELP_PREF, String.valueOf(isChecked));
             }
         });
 
         Switch googlePlacesSwitch = (Switch) findViewById(R.id.switch_google_places);
-        googlePlacesSwitch.setChecked(Boolean.parseBoolean(Util.getSettings(this, Util.GOOGLE_PLACES_PREF)));
+        googlePlacesSwitch.setChecked(Boolean.parseBoolean(Util.getSettings(this, Constants.GOOGLE_PLACES_PREF)));
         googlePlacesSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                setSetting(Util.GOOGLE_PLACES_PREF, String.valueOf(isChecked));
+                setSetting(Constants.GOOGLE_PLACES_PREF, String.valueOf(isChecked));
             }
         });
 
@@ -94,22 +110,22 @@ public class SettingsActivity extends AppCompatActivity {
         seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 // TODO Auto-generated method stub
+                radius = progress;
+                setSetting(Constants.PROXIMITY_RADIUS, String.valueOf(radius));
+                TextView radius_text = (TextView) findViewById(R.id.radiusCurrentValueID);
+                radius_text.setText(String.valueOf(radius) + " miles");
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-                // TODO Auto-generated method stub
+
             }
 
             @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                // TODO Auto-generated method stub
-                radius = progress;
-                setSetting(Util.PROXIMITY_RADIUS, String.valueOf(radius));
-                TextView radius_text = (TextView) findViewById(R.id.radiusCurrentValueID);
-                radius_text.setText(String.valueOf(radius) + " miles");
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
             }
         });
 
@@ -117,24 +133,38 @@ public class SettingsActivity extends AppCompatActivity {
         seek2.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 // TODO Auto-generated method stub
+                refresh_rate = progress;
+                setSetting(Constants.REFRESH_RATE, String.valueOf(refresh_rate));
+                TextView refresh_text = (TextView) findViewById(R.id.refreshCurrentValueID);
+                refresh_text.setText(String.valueOf(refresh_rate) + " min");
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-                // TODO Auto-generated method stub
+
             }
 
             @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                // TODO Auto-generated method stub
-                refresh_rate = progress;
-                setSetting(Util.REFRESH_RATE, String.valueOf(refresh_rate));
-                TextView refresh_text = (TextView) findViewById(R.id.refreshCurrentValueID);
-                refresh_text.setText(String.valueOf(refresh_rate) + " min");
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
             }
         });
+    }
+    private void googleCalendarLogin(boolean isChecked) {
+        if(isChecked) {
+            SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
+            mCredential = GoogleAccountCredential.usingOAuth2(
+                    getApplicationContext(), Arrays.asList(Constants.SCOPES))
+                    .setBackOff(new ExponentialBackOff())
+                    .setSelectedAccountName(settings.getString(Constants.PREF_ACCOUNT_NAME, null));
+            if (mCredential.getSelectedAccountName() == null) {
+               chooseAccount();
+            }
+        }else{
+           Util.setUserSetting(this,Constants.PREF_ACCOUNT_NAME,null);
+        }
 
     }
 
@@ -143,15 +173,9 @@ public class SettingsActivity extends AppCompatActivity {
             EvernoteSession.getInstance().authenticate(this);
         else
             Util.logout(this);
-
-//        Button evernoteButton = (Button) findViewById(R.id.logout_evernote);
-//        evernoteButton.setEnabled(true);
-//        evernoteButton.setClickable(true);
-//        evernoteButton.setAlpha(1f);
-//        evernoteButton.setBackgroundColor(Color.GRAY);
-//        // Enable the Logout from Evernote Button
-
     }
+
+
 
     private void setSetting(String key,String value) {
         Util.setUserSetting(this, key, value);
@@ -165,10 +189,52 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    protected void onActivityResult(
+            int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch(requestCode) {
+            case REQUEST_GOOGLE_PLAY_SERVICES:
+                if (resultCode != RESULT_OK) {
+                    isGooglePlayServicesAvailable();
+                }
+                break;
+            case REQUEST_ACCOUNT_PICKER:
+                if (resultCode == RESULT_OK && data != null &&
+                        data.getExtras() != null) {
+                    String accountName =
+                            data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
+                    if (accountName != null) {
+                        mCredential.setSelectedAccountName(accountName);
+                        Util.setUserSetting(this, Constants.PREF_ACCOUNT_NAME, accountName);
+                    }
+                    else{
+                        googleCalendarSwitch.setChecked(false);
+                    }
+                }else
+                    googleCalendarSwitch.setChecked(false);
+                break;
+            case REQUEST_AUTHORIZATION:
+                if (resultCode != RESULT_OK) {
+                    chooseAccount();
+                }
+                break;
+        }
+
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void chooseAccount() {
+       startActivityForResult(
+                mCredential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
+    }
+
     private boolean isGooglePlayServicesAvailable() {
         final int connectionStatusCode =
                 GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
         if (GooglePlayServicesUtil.isUserRecoverableError(connectionStatusCode)) {
+            showGooglePlayServicesAvailabilityErrorDialog(connectionStatusCode);
             return false;
         } else if (connectionStatusCode != ConnectionResult.SUCCESS ) {
             return false;
@@ -176,43 +242,16 @@ public class SettingsActivity extends AppCompatActivity {
         return true;
     }
 
-    // Anmol not needed
-    public void logoutEvernote() {
-        if(EvernoteSession.getInstance()!=null) {
-                if(EvernoteSession.getInstance().isLoggedIn()) {
-                 //   Button evernoteButton = (Button) findViewById(R.id.logout_evernote);
-                 //   evernoteButton.setEnabled(false);
-                  //  evernoteButton.setAlpha(.5f);
-                  //  evernoteButton.setClickable(false);
-                  //  evernoteButton.setBackgroundColor(Color.DKGRAY);
-                    // logout from evernote
-                    // disable the switch
-                }
-        }
+    void showGooglePlayServicesAvailabilityErrorDialog(
+            final int connectionStatusCode) {
+        Dialog dialog = GooglePlayServicesUtil.getErrorDialog(
+                connectionStatusCode,
+                SettingsActivity.this,
+                REQUEST_GOOGLE_PLAY_SERVICES);
+        dialog.show();
     }
 
-    // Anmol Not Needed
-    public boolean onTouch(View view, MotionEvent event) {
 
-        switch (event.getActionMasked()) {
 
-            case MotionEvent.ACTION_DOWN:
 
-                dX = view.getX() - event.getRawX();
-                dY = view.getY() - event.getRawY();
-                break;
-
-            case MotionEvent.ACTION_MOVE:
-
-                view.animate()
-                        .x(event.getRawX() + dX)
-                        .y(event.getRawY() + dY)
-                        .setDuration(0)
-                        .start();
-                break;
-            default:
-                return false;
-        }
-        return true;
-    }
 }

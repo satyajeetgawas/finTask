@@ -12,24 +12,15 @@ import com.evernote.client.android.EvernoteSession;
 public final class Util {
 
 
-
-    public static final int SEARCH_LIMIT = 10;
-    private static final String USER_SETTING = "UserSetting" ;
-    public static final String GOOGLE_CALENDAR_PREF = "GOOGLE_CALENDAR_PREF";
-    public static final String YELP_PREF = "YELP_PREF";
-    public static final String GOOGLE_PLACES_PREF = "GOOGLE_PLACES_PREF";
-    public static final String PROXIMITY_RADIUS = "PROXIMITY_RADIUS";
     private static String PROXIMITY_RADIUS_VAL = "2000";
-    public static final String REFRESH_RATE = "REFRESH_RATE";
     private static String REFRESH_RATE_VAL = "2000";
-    //public static long REFRESH_RATE = 30000;
-    public static String EVERNOTE_USER_PREF = "EVERNOTE_USER_PREF";
+
     private Util() {
         // no op
     }
 
     public static int getSearchLimit() {
-        return SEARCH_LIMIT;
+        return Constants.SEARCH_LIMIT;
     }
 
     public static void logout(Activity activity) {
@@ -51,20 +42,20 @@ public final class Util {
     }
 
     public static String getSettings(Activity activity,String key){
-        SharedPreferences settings = activity.getSharedPreferences(USER_SETTING, 0);
+        SharedPreferences settings = activity.getSharedPreferences(Constants.USER_SETTING, 0);
         return settings.getString(key,"0");
     }
 
     public static void setUserSetting(Activity activity,String key,String value){
-        SharedPreferences settings = activity.getSharedPreferences(USER_SETTING, 0);
+        SharedPreferences settings = activity.getSharedPreferences(Constants.USER_SETTING, 0);
         SharedPreferences.Editor editor = settings.edit();
         editor.putString(key,value);
         editor.commit();
     }
 
     public static void initializeUserSettings(MainActivity mainActivity) {
-        SharedPreferences settings = mainActivity.getSharedPreferences(USER_SETTING, 0);
-        PROXIMITY_RADIUS_VAL = settings.getString(PROXIMITY_RADIUS, "2000");
-        REFRESH_RATE_VAL = settings.getString(REFRESH_RATE, "2000");
+        SharedPreferences settings = mainActivity.getSharedPreferences(Constants.USER_SETTING, 0);
+        PROXIMITY_RADIUS_VAL = settings.getString(Constants.PROXIMITY_RADIUS, "2000");
+        REFRESH_RATE_VAL = settings.getString(Constants.REFRESH_RATE, "2000");
     }
 }

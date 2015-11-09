@@ -4,6 +4,8 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v7.app.AlertDialog;
@@ -15,8 +17,12 @@ import android.widget.Toast;
 
 import com.appmagnet.fintaskanyplace.R;
 import com.appmagnet.fintaskanyplace.backgroundtasks.BackgroundTaskReceiver;
+import com.appmagnet.fintaskanyplace.core.RefreshCachedNotesDB;
+import com.appmagnet.fintaskanyplace.db.DBContract;
+import com.appmagnet.fintaskanyplace.db.NotesDBHelper;
 import com.appmagnet.fintaskanyplace.evernote.ReadUserNotes;
 import com.appmagnet.fintaskanyplace.initializer.LocationHandler;
+import com.appmagnet.fintaskanyplace.util.Constants;
 import com.appmagnet.fintaskanyplace.util.Util;
 import com.evernote.client.android.EvernoteSession;
 import com.google.android.gms.common.ConnectionResult;
@@ -44,12 +50,12 @@ public class MainActivity extends AppCompatActivity {
         Context context = this.getApplicationContext();
         backgroundTaskReceiver.doInBackground(context);
 
+        RefreshCachedNotesDB dbTask = new RefreshCachedNotesDB(this);
+        dbTask.execute();
+        Toast.makeText(getApplicationContext(), "DB writing started", Toast.LENGTH_SHORT).show();
 
 
 
-
-        // Intent intent = new Intent(getBaseContext(), CalendarLogin.class);
-        //startActivity(intent);
 
         //String loc = "Latitude " + locHandle.getLocationMap().get(LocationHandler.LATITUDE) + " Longitude " +
         //        locHandle.getLocationMap().get(LocationHandler.LONGITUDE);
@@ -87,7 +93,8 @@ public class MainActivity extends AppCompatActivity {
     private void checkAndInitializePrerequisites() {
         locHandle= new LocationHandler(this);
 
-        if (EvernoteSession.getInstance()==null || !EvernoteSession.getInstance().isLoggedIn())
+        if ((EvernoteSession.getInstance()==null || !EvernoteSession.getInstance().isLoggedIn()) &&
+                "0".equals(Util.getSettings(this, Constants.PREF_ACCOUNT_NAME)))
         {
            showEnableAtleastOneAccount();
         }
@@ -104,28 +111,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void showTaskList() {
 
-        final List<String> namesList = new ArrayList<>();
-        //--Set guid of notebook to only retrieve notes for the current notebok
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                ReadUserNotes userNotes = new ReadUserNotes();
-                if (userNotes.queryNotesGuid()) {
-                    if (userNotes.queryNotesRawData()) {
-                        namesList.addAll(userNotes.processRawNoteData());
-                    }
-                }
 
-            }
-        });
 
-        thread.start();
-
-        while (thread.isAlive()) ;
-        if (namesList.size() > 0) {
-            String noteNames = TextUtils.join(", ", namesList);
-            Toast.makeText(getApplicationContext(), "" + noteNames + " notes have been retrieved", Toast.LENGTH_LONG).show();
-        }
     }
 
 
@@ -182,4 +169,19 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    public void showPostDBWrite() {
+
+        NotesDBHelper mDbHelper = new NotesDBHelper(getApplicationContext());
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        Cursor c = db.query(
+                DBContract.NotesEntry.TABLE_NAME,  // The table to query
+                null,                               // The columns to return
+                null,                                // The columns for the WHERE clause
+                null,                            // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                null                                 // The sort order
+        );
+        Toast.makeText(getApplicationContext(), "DB writing finished "+c.getCount(), Toast.LENGTH_SHORT).show();
+    }
 }
