@@ -61,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
     public void onResume(){
         super.onResume();
         checkAndInitializePrerequisites();
+        Util.initializeUserSettings(this);
     }
 
     @Override

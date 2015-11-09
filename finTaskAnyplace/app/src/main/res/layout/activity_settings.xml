@@ -41,6 +41,13 @@
         android:checked="false"
         android:textSize="@dimen/abc_text_size_large_material" />
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/abc_action_bar_stacked_max_height"
+        android:text="@string/search_engine"
+        android:id="@+id/search_engine"
+        android:textSize="@dimen/abc_text_size_headline_material" />
+
     <View
         android:layout_width="fill_parent"
         android:layout_height="2dp"
@@ -89,7 +96,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/radiusSeekBarTextID"
-            android:layout_marginTop="26dp"
+            android:layout_marginTop="10dp"
             android:max="10">
         </SeekBar>
 
@@ -101,12 +108,22 @@
             android:text="0 mile" />
 
         <TextView
+            android:id="@+id/radiusCurrentValueID"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignWithParentIfMissing="true"
+            android:layout_alignTop="@+id/radiusFrontValueID"
+            android:text="0 mile"
+            android:layout_centerHorizontal="true" />
+
+        <TextView
             android:id="@+id/radiusEndValueID"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_below="@+id/RadiusSeekBarID"
-            android:text="10 miles" />
+            android:text="10 miles"
+            android:layout_alignWithParentIfMissing="true" />
     </RelativeLayout>
 
     <RelativeLayout
@@ -129,7 +146,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/refreshTextID"
-            android:layout_marginTop="26dp"
+            android:layout_marginTop="10dp"
             android:max="60" >
         </SeekBar>
 
@@ -141,36 +158,26 @@
             android:text="1 min" />
 
         <TextView
+            android:id="@+id/refreshCurrentValueID"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignWithParentIfMissing="true"
+            android:layout_below="@+id/refreshSeekBarID"
+            android:text="1 min"
+            android:layout_centerHorizontal="true" />
+
+
+        <TextView
             android:id="@+id/refreshEndValueID"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_below="@+id/refreshSeekBarID"
             android:text="60 min" />
+
+
     </RelativeLayout>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/abc_action_bar_stacked_max_height"
-        android:text="@string/logout_accounts"
-        android:id="@+id/logout_accounts"
-        android:textSize="@dimen/abc_text_size_headline_material" />
-
-    <Button
-        android:layout_width="256dp"
-        android:layout_height="wrap_content"
-        android:text="@string/logout_evernote"
-        android:id="@+id/logout_evernote"
-        android:enabled="false"
-        android:onClick="logoutEvernote"/>
-
-    <Button
-        android:layout_width="254dp"
-        android:layout_height="wrap_content"
-        android:text="@string/logout_calender"
-        android:id="@+id/logout_calender"
-        android:enabled="true"
-        android:onClick="logoutGoogleCalender" />
 
 
 </LinearLayout>
