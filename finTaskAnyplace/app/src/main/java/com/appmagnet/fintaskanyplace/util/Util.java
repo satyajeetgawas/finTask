@@ -7,7 +7,7 @@ import com.appmagnet.fintaskanyplace.activity.MainActivity;
 import com.evernote.client.android.EvernoteSession;
 
 /**
- * @author rwondratschek
+ * created by satyajeet and anmol
  */
 public final class Util {
 

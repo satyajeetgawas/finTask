@@ -3,7 +3,7 @@ package com.appmagnet.fintaskanyplace.util;
 import com.google.api.services.calendar.CalendarScopes;
 
 /**
- * Created by satyajeet on 11/9/2015.
+ * Created by satyajeet and anmol on 11/9/2015.
  */
 public interface Constants {
 

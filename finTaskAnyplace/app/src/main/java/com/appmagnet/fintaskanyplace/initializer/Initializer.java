@@ -6,6 +6,10 @@ import android.app.Application;
 import com.appmagnet.fintaskanyplace.util.ApiKeys;
 import com.evernote.client.android.EvernoteSession;
 
+/*
+created by satyajeet and anmol
+ */
+
 public class Initializer extends Application {
 
     private static final EvernoteSession.EvernoteService EVERNOTE_SERVICE = EvernoteSession.EvernoteService.SANDBOX;

@@ -3,7 +3,7 @@ package com.appmagnet.fintaskanyplace.dataobjects;
 import java.util.Map;
 
 /**
- * Created by satyajeet on 11/6/2015.
+ * Created by satyajeet and anmol on 11/6/2015.
  */
 public class BusinessObject {
 

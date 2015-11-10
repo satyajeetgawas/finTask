@@ -1,6 +1,9 @@
 package com.appmagnet.fintaskanyplace.activity;
 
 import android.app.Dialog;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -8,11 +11,13 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.appmagnet.fintaskanyplace.R;
@@ -28,11 +33,13 @@ import com.evernote.client.android.EvernoteSession;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by satyajeet on 10/12/2015.
+ * Created by satyajeet and anmol on 10/12/2015.
  */
 public class MainActivity extends AppCompatActivity {
 
@@ -89,7 +96,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
     private void checkAndInitializePrerequisites() {
         locHandle= new LocationHandler(this);
 
@@ -108,6 +114,25 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    public void createNotification(String text) {
+        // Prepare intent which is triggered if the
+        // notification is selected
+        Intent intent = new Intent(this, NotificationReciever.class);
+        PendingIntent pIntent = PendingIntent.getActivity(this, (int) System.currentTimeMillis(), intent, 0);
+
+        // Build notification
+        // Actions are just fake
+        NotificationCompat.Builder noti = new NotificationCompat.Builder(this)
+                .setContentTitle("finTaskAnyplace")
+                .setContentText(text).setSmallIcon(R.drawable.evernote)
+                .setContentIntent(pIntent);
+        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        // hide the notification after its selected
+        noti.build().flags |= NotificationCompat.FLAG_AUTO_CANCEL;
+
+        notificationManager.notify(0, noti.build());
+
+    }
 
     private void showTaskList() {
 
@@ -183,5 +208,6 @@ public class MainActivity extends AppCompatActivity {
                 null                                 // The sort order
         );
         Toast.makeText(getApplicationContext(), "DB writing finished "+c.getCount(), Toast.LENGTH_SHORT).show();
+        createNotification("Could generate the notification");
     }
 }

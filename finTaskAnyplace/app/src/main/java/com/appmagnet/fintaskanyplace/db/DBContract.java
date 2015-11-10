@@ -3,7 +3,7 @@ package com.appmagnet.fintaskanyplace.db;
 import android.provider.BaseColumns;
 
 /**
- * Created by satyajeet on 11/9/2015.
+ * Created by satyajeet and anmol on 11/9/2015.
  */
 public final class DBContract {
 

@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by satyajeet on 11/9/2015.
+ * Created by satyajeet and anmol on 11/9/2015.
  */
 public class GoogleGalendarApiTask  {
     private com.google.api.services.calendar.Calendar mService = null;

@@ -25,7 +25,7 @@ import com.google.api.client.util.ExponentialBackOff;
 import java.util.Arrays;
 
 /**
- * Created by satyajeet on 11/6/2015.
+ * Created by satyajeet and anmol on 10/21/2015.
  */
 public class SettingsActivity extends AppCompatActivity {
 

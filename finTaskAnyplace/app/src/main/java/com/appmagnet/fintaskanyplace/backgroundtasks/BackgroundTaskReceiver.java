@@ -11,7 +11,7 @@ import com.appmagnet.fintaskanyplace.core.RunBusinessQuery;
 import com.appmagnet.fintaskanyplace.util.Util;
 
 /**
- * Created by satyajeet on 10/21/2015.
+ * Created by satyajeet and anmol on 10/21/2015.
  */
 public class BackgroundTaskReceiver extends BroadcastReceiver {
 

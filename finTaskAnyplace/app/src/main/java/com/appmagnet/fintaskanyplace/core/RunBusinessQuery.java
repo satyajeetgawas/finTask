@@ -13,7 +13,7 @@ import com.appmagnet.fintaskanyplace.yelp.YelpAPI;
 import java.util.ArrayList;
 
 /**
- * Created by satyajeet on 11/6/2015.
+ * Created by satyajeet and anmol on 11/6/2015.
  */
 public class RunBusinessQuery extends AsyncTask<Context, Void, ArrayList<BusinessObject>> {
     Context context;
