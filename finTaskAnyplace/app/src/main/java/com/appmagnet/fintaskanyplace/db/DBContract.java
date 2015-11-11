@@ -15,5 +15,6 @@ public final class DBContract {
         public static final String COLUMN_NAME_TITLE = "title";
         public static final String COLUMN_CONTENT = "content";
         public static final String COLUMN_CATEGORY = "category";
+        public static final String COLUMN_NOTE_DATE = "note_date";
     }
 }
