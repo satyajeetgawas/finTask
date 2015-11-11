@@ -1,185 +1,210 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
     android:divider="?android:dividerHorizontal"
-    android:showDividers="middle"
+    android:orientation="vertical"
     android:weightSum="1">
 
-
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/abc_action_bar_stacked_max_height"
-        android:text="@string/add_accounts"
-        android:id="@+id/add_accounts"
-        android:textSize="@dimen/abc_text_size_headline_material" />
-
-    <View
-        android:layout_width="fill_parent"
-        android:layout_height="2dp"
-        android:background="#c0c0c0"/>
-
-
-    <Switch
-        android:layout_width="fill_parent"
-        android:layout_height="@dimen/abc_action_button_min_height_material"
-        android:text="@string/evernote"
-        android:id="@+id/switch_evernote"
-        android:layout_gravity="center_horizontal"
-        android:checked="true"
-        android:textSize="@dimen/abc_text_size_large_material" />
-
-    <View
-        android:layout_width="fill_parent"
-        android:layout_height="2dp"
-        android:background="#c0c0c0"/>
-
-    <Switch
-        android:layout_width="fill_parent"
-        android:layout_height="@dimen/abc_action_button_min_height_material"
-        android:text="@string/google_calendar"
-        android:id="@+id/switch_google_calendar"
-        android:checked="false"
-        android:textSize="@dimen/abc_text_size_large_material" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/abc_action_bar_stacked_max_height"
-        android:text="@string/search_engine"
-        android:id="@+id/search_engine"
-        android:textSize="@dimen/abc_text_size_headline_material" />
-
-    <View
-        android:layout_width="fill_parent"
-        android:layout_height="2dp"
-        android:background="#c0c0c0"/>
-
-    <Switch
-        android:layout_width="fill_parent"
-        android:layout_height="@dimen/abc_action_button_min_height_material"
-        android:text="@string/yelp"
-        android:id="@+id/switch_yelp"
-        android:checked="true"
-        android:textSize="@dimen/abc_text_size_large_material"
-        android:backgroundTint="@color/abc_search_url_text_pressed" />
-
-    <View
-        android:layout_width="fill_parent"
-        android:layout_height="2dp"
-        android:background="#c0c0c0"/>
-
-    <Switch
-        android:layout_width="fill_parent"
-        android:layout_height="@dimen/abc_action_button_min_height_material"
-        android:text="@string/google_places"
-        android:id="@+id/switch_google_places"
-        android:checked="true"
-        android:textSize="@dimen/abc_text_size_large_material"
-        android:backgroundTint="@color/abc_search_url_text_pressed" />
-
-    <RelativeLayout
-        android:id="@+id/relativeLayoutforRadius"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" >
-
-        <TextView
-            android:id="@+id/radiusSeekBarTextID"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:text="@string/radius"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
-
-        <SeekBar
-            android:id="@+id/RadiusSeekBarID"
+     <TextView
+            android:id="@+id/add_accounts"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@+id/radiusSeekBarTextID"
-            android:layout_marginTop="10dp"
-            android:max="10">
-        </SeekBar>
+            android:layout_weight="0.10"
+            android:text="@string/add_accounts"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="@dimen/heading_text_size"
+         android:textStyle="bold" />
+
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="2dp"
+            android:background="#c0c0c0" />
+
+        <Switch
+            android:id="@+id/switch_evernote"
+            android:layout_width="fill_parent"
+            android:layout_height="@dimen/layout_height"
+            android:layout_gravity="center_horizontal"
+            android:checked="false"
+            android:text="@string/evernote"
+            android:textSize="@dimen/switch_text_size" />
+
+        <Switch
+            android:id="@+id/switch_google_calendar"
+            android:layout_width="fill_parent"
+            android:layout_height="@dimen/layout_height"
+            android:checked="false"
+            android:text="@string/google_calendar"
+            android:textSize="@dimen/switch_text_size" />
 
         <TextView
-            android:id="@+id/radiusFrontValueID"
-            android:layout_width="wrap_content"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/RadiusSeekBarID"
-            android:text="0 mile" />
+            android:layout_weight="0.10" />
 
         <TextView
-            android:id="@+id/radiusCurrentValueID"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignWithParentIfMissing="true"
-            android:layout_alignTop="@+id/radiusFrontValueID"
-            android:text="0 mile"
-            android:layout_centerHorizontal="true" />
-
-        <TextView
-            android:id="@+id/radiusEndValueID"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_below="@+id/RadiusSeekBarID"
-            android:text="10 miles"
-            android:layout_alignWithParentIfMissing="true" />
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/relativeLayoutforRefreshID"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" >
-
-        <TextView
-            android:id="@+id/refreshTextID"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:text="@string/refresh_rate"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
-
-        <SeekBar
-            android:id="@+id/refreshSeekBarID"
+            android:id="@+id/search_engine"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@+id/refreshTextID"
-            android:layout_marginTop="10dp"
-            android:max="60" >
-        </SeekBar>
+            android:layout_height="34dp"
+            android:text="@string/search_engine"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="@dimen/heading_text_size"
+            android:textStyle="bold" />
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="2dp"
+            android:background="#c0c0c0" />
+
+        <Switch
+            android:id="@+id/switch_yelp"
+            android:layout_width="fill_parent"
+            android:layout_height="@dimen/layout_height"
+            android:backgroundTint="@color/abc_search_url_text_pressed"
+            android:checked="true"
+            android:text="@string/yelp"
+            android:textSize="@dimen/switch_text_size" />
+
+        <Switch
+            android:id="@+id/switch_google_places"
+            android:layout_width="fill_parent"
+            android:layout_height="@dimen/layout_height"
+            android:backgroundTint="@color/abc_search_url_text_pressed"
+            android:checked="true"
+            android:text="@string/google_places"
+            android:textSize="@dimen/switch_text_size" />
 
         <TextView
-            android:id="@+id/refreshFrontValueID"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/refreshSeekBarID"
-            android:text="1 min" />
+            android:layout_weight="0.10" />
 
         <TextView
-            android:id="@+id/refreshCurrentValueID"
-            android:layout_width="wrap_content"
+            android:id="@+id/textView"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_alignWithParentIfMissing="true"
-            android:layout_below="@+id/refreshSeekBarID"
-            android:text="1 min"
-            android:layout_centerHorizontal="true" />
+            android:layout_weight="0.10"
+            android:text="@string/preferences"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="@dimen/heading_text_size"
+            android:textStyle="bold" />
+
+        <RelativeLayout
+            android:id="@+id/relativeLayoutforRadius"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/radiusSeekBarTextID"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignEnd="@+id/radiusEndValueID"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_alignRight="@+id/radiusEndValueID"
+                android:layout_marginTop="10dp"
+                android:text="@string/radius"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textSize="@dimen/switch_text_size" />
+
+            <SeekBar
+                android:id="@+id/RadiusSeekBarID"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/radiusSeekBarTextID"
+                android:layout_marginTop="10dp"
+                android:max="10"></SeekBar>
 
 
-        <TextView
-            android:id="@+id/refreshEndValueID"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_below="@+id/refreshSeekBarID"
-            android:text="60 min" />
+            <TextView
+                android:id="@+id/radiusFrontValueID"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/RadiusSeekBarID"
+                android:text="0 mile" />
+
+            <TextView
+                android:id="@+id/radiusCurrentValueID"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/radiusFrontValueID"
+                android:layout_alignWithParentIfMissing="true"
+                android:layout_centerHorizontal="true"
+                android:text="0 mile" />
+
+            <TextView
+                android:id="@+id/radiusEndValueID"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignWithParentIfMissing="true"
+                android:layout_below="@+id/RadiusSeekBarID"
+                android:text="10 miles" />
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="2dp"
+                android:layout_alignEnd="@+id/radiusEndValueID"
+                android:layout_alignParentTop="true"
+                android:layout_alignRight="@+id/radiusEndValueID"
+                android:background="#c0c0c0" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/relativeLayoutforRefreshID"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/refreshTextID"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="10dp"
+                android:text="@string/refresh_rate"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textSize="@dimen/switch_text_size" />
+
+            <SeekBar
+                android:id="@+id/refreshSeekBarID"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/refreshTextID"
+                android:layout_marginTop="10dp"
+                android:max="60"></SeekBar>
+
+            <TextView
+                android:id="@+id/refreshFrontValueID"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/refreshSeekBarID"
+                android:text="1 min" />
+
+            <TextView
+                android:id="@+id/refreshCurrentValueID"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignWithParentIfMissing="true"
+                android:layout_below="@+id/refreshSeekBarID"
+                android:layout_centerHorizontal="true"
+                android:text="1 min" />
 
 
-    </RelativeLayout>
+            <TextView
+                android:id="@+id/refreshEndValueID"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/refreshSeekBarID"
+                android:text="60 min" />
 
+
+        </RelativeLayout>
 
 
 </LinearLayout>

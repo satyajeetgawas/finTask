@@ -1,5 +1,9 @@
 package com.appmagnet.fintaskanyplace.evernote;
 
+import android.content.ContentValues;
+import android.database.sqlite.SQLiteDatabase;
+
+import com.appmagnet.fintaskanyplace.db.DBContract;
 import com.evernote.client.android.EvernoteSession;
 import com.evernote.client.android.asyncclient.EvernoteNoteStoreClient;
 import com.evernote.edam.error.EDAMNotFoundException;
@@ -11,7 +15,9 @@ import com.evernote.edam.type.Note;
 import com.evernote.thrift.TException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by satyajeet and anmol on 10/21/2015.
@@ -19,8 +25,8 @@ import java.util.List;
 public class ReadUserNotes {
 
     private List<String> guidList;
-    private List<String> notesRawData;
-    private List<String> notesData;
+    private Map notesData;
+    private Map notesTitle;
     private EvernoteNoteStoreClient noteStoreClient;
     final static String  NOTE_START         = "<en-note>";
     final static String NOTE_CLOSE = "</en-note>";
@@ -30,15 +36,15 @@ public class ReadUserNotes {
     final static String DIV_END = "</div>";
 
     public ReadUserNotes() {
-        guidList = new ArrayList<String>();
-        notesRawData = new ArrayList<String>();
-        notesData = new ArrayList<String>();
+        guidList = new ArrayList();
+        notesTitle = new HashMap();
+        notesData = new HashMap();
         noteStoreClient = EvernoteSession.getInstance().getEvernoteClientFactory().getNoteStoreClient();
 
     }
 
-    public boolean queryNotesGuid() {
-        try {
+    private void  queryNotesGuid() throws EDAMUserException, EDAMSystemException, TException, EDAMNotFoundException {
+
             NoteFilter filter = new NoteFilter();
             NoteList noteList = noteStoreClient.findNotes(filter, 0, 10);
             if (noteList != null) {
@@ -46,47 +52,47 @@ public class ReadUserNotes {
 
                 for (Note note : listOfNotes) {
                     guidList.add(note.getGuid());
+                    notesTitle.put(note.getGuid(),note.getTitle());
+
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-        return true;
     }
 
-    public boolean queryNotesRawData() {
+    private void queryAndProcessNotesRawData() throws EDAMUserException, EDAMSystemException, TException, EDAMNotFoundException {
+
+        for (String guid : guidList) {
+            String noteRawData = noteStoreClient.getNoteContent(guid);
+            String noteData = noteRawData.substring(noteRawData.indexOf(NOTE_START));
+            noteData = noteData.replaceAll(NOTE_START, "");
+            noteData = noteData.replaceAll(NOTE_CLOSE, "");
+            noteData = noteData.replaceAll(TODO_TAG_START, "");
+            noteData = noteData.replaceAll(TODO_TAG_CLOSE, "");
+            noteData = noteData.replaceAll(DIV, "");
+            noteData = noteData.replaceAll(DIV_END, "");
+            notesData.put(guid, noteData);
+
+        }
+    }
+
+    public void writeNotesToDB(SQLiteDatabase db) throws Exception {
+
         try {
+            queryNotesGuid();
+            queryAndProcessNotesRawData();
             for (String guid : guidList) {
-                notesRawData.add(noteStoreClient.getNoteContent(guid));
+                ContentValues values = new ContentValues();
+                values.put(DBContract.NotesEntry.COLUMN_NAME_TITLE, (String) notesTitle.get(guid));
+                values.put(DBContract.NotesEntry.COLUMN_CONTENT, (String) notesData.get(guid));
+                db.insert(
+                        DBContract.NotesEntry.TABLE_NAME,
+                        null,
+                        values);
+
             }
-
-        } catch (EDAMNotFoundException | EDAMSystemException | EDAMUserException | TException e) {
-            e.printStackTrace();
-            return false;
-        }
-        return true;
-    }
-
-    public List<String> processRawNoteData(){
-        for(String noteRaw : notesRawData){
-            String noteData = noteRaw.substring(noteRaw.indexOf(NOTE_START));
-            noteData = noteData.replaceAll(NOTE_START,"");
-            noteData = noteData.replaceAll(NOTE_CLOSE,"");
-            noteData = noteData.replaceAll(TODO_TAG_START,"");
-            noteData = noteData.replaceAll(TODO_TAG_CLOSE,"");
-            noteData = noteData.replaceAll(DIV,"");
-            noteData = noteData.replaceAll(DIV_END,"");
-            notesData.add(noteData);
+        } catch (Exception e) {
+            throw new Exception("Error while retrieving data from evernote");
 
         }
-        return notesData;
-
     }
-
-    public List<String> allNotesData(){
-        return notesData;
-    }
-
 
 }

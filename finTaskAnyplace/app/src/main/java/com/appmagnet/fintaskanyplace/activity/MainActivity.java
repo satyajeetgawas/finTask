@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
     public void onResume(){
         super.onResume();
         checkAndInitializePrerequisites();
-        Util.initializeUserSettings(this);
+      //  Util.initializeUserSettings(this);
     }
 
     @Override
@@ -114,33 +114,12 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void createNotification(String text) {
-        // Prepare intent which is triggered if the
-        // notification is selected
-        Intent intent = new Intent(this, NotificationReciever.class);
-        PendingIntent pIntent = PendingIntent.getActivity(this, (int) System.currentTimeMillis(), intent, 0);
-
-        // Build notification
-        // Actions are just fake
-        NotificationCompat.Builder noti = new NotificationCompat.Builder(this)
-                .setContentTitle("finTaskAnyplace")
-                .setContentText(text).setSmallIcon(R.drawable.evernote)
-                .setContentIntent(pIntent);
-        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        // hide the notification after its selected
-        noti.build().flags |= NotificationCompat.FLAG_AUTO_CANCEL;
-
-        notificationManager.notify(0, noti.build());
-
-    }
 
     private void showTaskList() {
 
 
 
     }
-
-
 
     private void showEnableAtleastOneAccount() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -183,17 +162,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private boolean isGooglePlayServicesAvailable() {
-        final int connectionStatusCode =
-                GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-        if (GooglePlayServicesUtil.isUserRecoverableError(connectionStatusCode)) {
-            return false;
-        } else if (connectionStatusCode != ConnectionResult.SUCCESS ) {
-            return false;
-        }
-        return true;
-    }
-
     public void showPostDBWrite() {
 
         NotesDBHelper mDbHelper = new NotesDBHelper(getApplicationContext());
@@ -208,6 +176,6 @@ public class MainActivity extends AppCompatActivity {
                 null                                 // The sort order
         );
         Toast.makeText(getApplicationContext(), "DB writing finished "+c.getCount(), Toast.LENGTH_SHORT).show();
-        createNotification("Could generate the notification");
+
     }
 }

@@ -32,7 +32,7 @@ public class GooglePlacesApi {
         urlString.append("&types=" + term);
         urlString.append("&location=" + location);
         urlString.append("&radius=" + Util.getRadius());
-        urlString.append("&opennow");
+      //  urlString.append("&opennow");
         urlString.append("&sensor=false");
         urlString.append("&key=" + ApiKeys.GOOGLE_API_KEY);
 
@@ -60,11 +60,18 @@ public class GooglePlacesApi {
 
     private ArrayList<BusinessObject> getBusinessObjectsFromJson(String jsonResponse) {
         ArrayList<BusinessObject> listPlaces = null;
+        JSONObject json = null;
+        JSONArray results = new JSONArray();
         try {
-            JSONObject json = new JSONObject(jsonResponse);
-            JSONArray results = json.getJSONArray("results");
-            listPlaces = new ArrayList<BusinessObject>(results.length());
-            for (int i = 0; i < results.length(); i++) {
+            json = new JSONObject(jsonResponse);
+            results = json.getJSONArray("results");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        listPlaces = new ArrayList<BusinessObject>(results.length());
+        for (int i = 0; i < results.length(); i++) {
+            try {
                 JSONObject business = results.getJSONObject(i);
                 Map<String, String> busProp = new HashMap<String, String>();
                 busProp.put(BusinessObject.NAME, business.getString("name"));
@@ -72,11 +79,11 @@ public class GooglePlacesApi {
                 busProp.put(BusinessObject.LATITUDE, business.getJSONObject("geometry").getJSONObject("location").getString("lat"));
                 busProp.put(BusinessObject.LONGITUDE, business.getJSONObject("geometry").getJSONObject("location").getString("lng"));
                 listPlaces.add(new BusinessObject(busProp));
-
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
         }
+
         if (listPlaces == null)
             listPlaces = new ArrayList<BusinessObject>();
         return listPlaces;

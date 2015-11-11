@@ -42,7 +42,7 @@ public class RefreshCachedNotesDB extends AsyncTask<Void,Void,Void> {
                 refreshEvernoteData();
             if (!"0".equals(Util.getSettings(activity, Constants.PREF_ACCOUNT_NAME)))
                 refreshCalendarData();
-        }catch (IOException e){
+        }catch (Exception e){
             cancel(true);
         }
         return null;
@@ -54,29 +54,18 @@ public class RefreshCachedNotesDB extends AsyncTask<Void,Void,Void> {
                 activity.getApplicationContext(), Arrays.asList(Constants.SCOPES))
                 .setBackOff(new ExponentialBackOff())
                 .setSelectedAccountName(Util.getSettings(activity, Constants.PREF_ACCOUNT_NAME));
-        String account  = Util.getSettings(activity, Constants.PREF_ACCOUNT_NAME);
-        if("0".equals(account))
-            return;
         GoogleGalendarApiTask syncCalendarTask = new GoogleGalendarApiTask(mCredential);
-        List<String> eventList = syncCalendarTask.getDataFromApi();
-        for(String event:eventList){
-            SQLiteDatabase db = mDbHelper.getWritableDatabase();
-            ContentValues values = new ContentValues();
-            values.put(DBContract.NotesEntry.COLUMN_NAME_TITLE, "google calendar");
-            values.put(DBContract.NotesEntry.COLUMN_CONTENT, event);
-            long newRowId;
-            newRowId = db.insert(
-                    DBContract.NotesEntry.TABLE_NAME,
-                    null,
-                    values);
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        syncCalendarTask.writeToDB(db);
+        db.close();
 
-        }
     }
 
-    private void refreshEvernoteData() {
-        ReadUserNotes userNotes = new ReadUserNotes();
-
-
+    private void refreshEvernoteData() throws Exception {
+      ReadUserNotes userNotes = new ReadUserNotes();
+        SQLiteDatabase db  = mDbHelper.getWritableDatabase();
+        userNotes.writeNotesToDB(db);
+        db.close();
     }
 
     @Override

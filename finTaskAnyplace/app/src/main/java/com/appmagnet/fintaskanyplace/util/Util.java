@@ -1,6 +1,7 @@
 package com.appmagnet.fintaskanyplace.util;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.appmagnet.fintaskanyplace.activity.MainActivity;
@@ -14,13 +15,14 @@ public final class Util {
 
     private static String PROXIMITY_RADIUS_VAL = "2000";
     private static String REFRESH_RATE_VAL = "2000";
+    private static String SEARCH_LIMIT = "10";
 
     private Util() {
         // no op
     }
 
-    public static int getSearchLimit() {
-        return Constants.SEARCH_LIMIT;
+    public static String getSearchLimit() {
+        return SEARCH_LIMIT;
     }
 
     public static void logout(Activity activity) {
@@ -35,14 +37,14 @@ public final class Util {
 
     public static long getRefreshRate() {
         long rate = new Long(REFRESH_RATE_VAL);
-        rate = rate * 1000 * 60;
+        rate = rate *  10;
         //REFRESH_RATE = 1000*30;
         //return REFRESH_RATE;
         return rate;
     }
 
-    public static String getSettings(Activity activity,String key){
-        SharedPreferences settings = activity.getSharedPreferences(Constants.USER_SETTING, 0);
+    public static String getSettings(Context context,String key){
+        SharedPreferences settings = context.getSharedPreferences(Constants.USER_SETTING, 0);
         return settings.getString(key,"0");
     }
 
@@ -53,9 +55,5 @@ public final class Util {
         editor.commit();
     }
 
-    public static void initializeUserSettings(MainActivity mainActivity) {
-        SharedPreferences settings = mainActivity.getSharedPreferences(Constants.USER_SETTING, 0);
-        PROXIMITY_RADIUS_VAL = settings.getString(Constants.PROXIMITY_RADIUS, "2000");
-        REFRESH_RATE_VAL = settings.getString(Constants.REFRESH_RATE, "2000");
-    }
+
 }

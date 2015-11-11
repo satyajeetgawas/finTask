@@ -1,7 +1,10 @@
 package com.appmagnet.fintaskanyplace.googleservices;
 
+import android.content.ContentValues;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 
+import com.appmagnet.fintaskanyplace.db.DBContract;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.http.HttpTransport;
@@ -64,6 +67,21 @@ public class GoogleGalendarApiTask  {
     }
 
 
+    public void writeToDB(SQLiteDatabase db) throws IOException {
+
+        List<String> eventList = getDataFromApi();
+        for(String event:eventList){
+
+            ContentValues values = new ContentValues();
+            values.put(DBContract.NotesEntry.COLUMN_NAME_TITLE, "google calendar");
+            values.put(DBContract.NotesEntry.COLUMN_CONTENT, event);
+            db.insert(
+                    DBContract.NotesEntry.TABLE_NAME,
+                    null,
+                    values);
+
+        }
+    }
 
 
 

@@ -13,5 +13,7 @@
     <string name="radius">Radius</string>
     <string name="refresh_rate">Notification Update Frequency</string>
     <string name="search_engine">Search Results From</string>
+    <string name="notification_msg">Some task can be completed based on your location. Click to view</string>
+    <string name="preferences">Preferences</string>
 
 </resources>

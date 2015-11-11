@@ -1,5 +1,6 @@
 package com.appmagnet.fintaskanyplace.backgroundtasks;
 
+import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -22,7 +23,7 @@ public class BackgroundTaskReceiver extends BroadcastReceiver {
         PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "YOUR TAG");
         //Acquire the lock
         wl.acquire();
-       // new RunBusinessQuery().execute(context);
+        new RunBusinessQuery().execute(context);
         //Release the lock
         wl.release();
     }

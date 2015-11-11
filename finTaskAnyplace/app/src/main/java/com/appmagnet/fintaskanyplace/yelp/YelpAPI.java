@@ -61,7 +61,7 @@ public class YelpAPI {
         OAuthRequest request = createOAuthRequest(SEARCH_PATH);
         request.addQuerystringParameter("term", term);
         request.addQuerystringParameter("ll", location);
-        request.addQuerystringParameter("limit", String.valueOf(Util.getSearchLimit()));
+        request.addQuerystringParameter("limit", Util.getSearchLimit());
         request.addQuerystringParameter("radius_limit", Util.getRadius());
         String responseJsonString = sendRequestAndGetResponse(request);
         return getBusinessObjectsFromJson(responseJsonString);
@@ -69,26 +69,33 @@ public class YelpAPI {
 
     private ArrayList<BusinessObject> getBusinessObjectsFromJson(String responseJsonString) {
         ArrayList<BusinessObject> listPlaces = null;
-        try {
-            JSONObject json = new JSONObject(responseJsonString);
-            JSONArray businesses = json.getJSONArray("businesses");
+        JSONObject json = null;
+        JSONArray businesses = null;
+       try{
+           json = new JSONObject(responseJsonString);
+           businesses = json.getJSONArray("businesses");
+          }catch(JSONException e) {
+           e.printStackTrace();
+       }
+        if(businesses !=null){
             listPlaces = new ArrayList<BusinessObject>(businesses.length());
             for (int i = 0; i < businesses.length(); i++) {
-                JSONObject business = businesses.getJSONObject(i);
-                Map<String,String> busProp = new HashMap<String,String>();
-                busProp.put( BusinessObject.NAME , business.getString("name"));
-                busProp.put( BusinessObject.RATING , business.getString("rating"));
-                busProp.put( BusinessObject.LATITUDE , business.getString("location.coordinate.latitude"));
-                busProp.put( BusinessObject.LONGITUDE ,  business.getString("location.coordinate.longitude"));
-                listPlaces.add(new BusinessObject(busProp));
+                try {
+                    JSONObject business = businesses.getJSONObject(i);
+                    Map<String,String> busProp = new HashMap<String,String>();
+                    busProp.put( BusinessObject.NAME , business.getString("name"));
+                    busProp.put( BusinessObject.RATING , business.getString("rating"));
+                  //  busProp.put( BusinessObject.LATITUDE , business.getString("location.coordinate.latitude"));
+                  //  busProp.put( BusinessObject.LONGITUDE ,  business.getString("location.coordinate.longitude"));
+                    listPlaces.add(new BusinessObject(busProp));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
         }
         if(listPlaces==null)
             listPlaces = new ArrayList<BusinessObject>();
         return listPlaces;
-
     }
 
 
