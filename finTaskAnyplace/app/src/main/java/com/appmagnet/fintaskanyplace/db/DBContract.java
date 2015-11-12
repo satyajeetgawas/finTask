@@ -17,4 +17,10 @@ public final class DBContract {
         public static final String COLUMN_CATEGORY = "category";
         public static final String COLUMN_NOTE_DATE = "note_date";
     }
+
+    public static abstract class CategoryEntry implements BaseColumns {
+        public static final String TABLE_NAME = "Category";
+        public static final String COLUMN_CATEGORY = "category";
+        public static final String COLUMN_CONTENTS = "content";
+    }
 }

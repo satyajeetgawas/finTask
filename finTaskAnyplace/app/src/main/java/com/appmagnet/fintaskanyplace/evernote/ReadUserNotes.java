@@ -1,5 +1,6 @@
 package com.appmagnet.fintaskanyplace.evernote;
 
+import android.app.Activity;
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -34,6 +35,7 @@ public class ReadUserNotes {
     final static String TODO_TAG_CLOSE = "</en-todo>";
     final static String DIV = "<div>";
     final static String DIV_END = "</div>";
+    final static String NEW_LINE = "<div><br clear=\"none\"/></div>";
 
     public ReadUserNotes() {
         guidList = new ArrayList();
@@ -67,14 +69,15 @@ public class ReadUserNotes {
             noteData = noteData.replaceAll(NOTE_CLOSE, "");
             noteData = noteData.replaceAll(TODO_TAG_START, "");
             noteData = noteData.replaceAll(TODO_TAG_CLOSE, "");
+            noteData = noteData.replaceAll(NEW_LINE,"");
             noteData = noteData.replaceAll(DIV, "");
-            noteData = noteData.replaceAll(DIV_END, "");
+            noteData = noteData.replaceAll(DIV_END, ",");
             notesData.put(guid, noteData);
 
         }
     }
 
-    public void writeNotesToDB(SQLiteDatabase db) throws Exception {
+    public void writeNotesToDB(SQLiteDatabase db, Activity activity) throws Exception {
 
         try {
             queryNotesGuid();

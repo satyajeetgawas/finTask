@@ -1,14 +1,10 @@
 package com.appmagnet.fintaskanyplace.core;
 
 import android.app.Activity;
-import android.content.ContentValues;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 
 import com.appmagnet.fintaskanyplace.activity.MainActivity;
-import com.appmagnet.fintaskanyplace.db.DBContract;
 import com.appmagnet.fintaskanyplace.db.NotesDBHelper;
 import com.appmagnet.fintaskanyplace.evernote.ReadUserNotes;
 import com.appmagnet.fintaskanyplace.googleservices.GoogleGalendarApiTask;
@@ -20,7 +16,6 @@ import com.google.api.client.util.ExponentialBackOff;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * Created by satyajeet and anmol on 11/9/2015.
@@ -64,7 +59,7 @@ public class RefreshCachedNotesDB extends AsyncTask<Void,Void,Void> {
     private void refreshEvernoteData() throws Exception {
       ReadUserNotes userNotes = new ReadUserNotes();
         SQLiteDatabase db  = mDbHelper.getWritableDatabase();
-        userNotes.writeNotesToDB(db);
+        userNotes.writeNotesToDB(db,activity);
         db.close();
     }
 
