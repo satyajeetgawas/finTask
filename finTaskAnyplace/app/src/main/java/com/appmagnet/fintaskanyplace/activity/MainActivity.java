@@ -175,7 +175,21 @@ public class MainActivity extends AppCompatActivity {
                 null,                                     // don't filter by row groups
                 null                                 // The sort order
         );
-        Toast.makeText(getApplicationContext(), "DB writing finished "+c.getCount(), Toast.LENGTH_SHORT).show();
+
+        String text = "";
+        if (c.moveToFirst()) {
+            do {
+                text += c.getString(c.getColumnIndex(DBContract.NotesEntry.COLUMN_NAME_TITLE)) +" "+
+                        c.getString(c.getColumnIndex(DBContract.NotesEntry.COLUMN_CATEGORY )) + " "+
+                                c.getString(c.getColumnIndex(DBContract.NotesEntry.COLUMN_CONTENT)) + "\n";
+
+            }
+            while (c.moveToNext());
+        }
+        if (c != null && !c.isClosed())
+            c.close();
+
+        Toast.makeText(getApplicationContext(), text, Toast.LENGTH_LONG).show();
 
     }
 }

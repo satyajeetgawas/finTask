@@ -39,7 +39,7 @@ public class RunBusinessQuery extends AsyncTask<Context, Void, ArrayList<Busines
         for (BusinessObject busObj : listOfBusinesses) {
             businessNames.add(busObj.getBusinessName() + ", " + busObj.getBusinessRating());
         }
-        if (businessNames != null) {
+        if ( businessNames.size()>0) {
 //           String businessesCon = TextUtils.join("\n", businessNames);
 //           Toast.makeText(context, businessesCon, Toast.LENGTH_LONG).show();
             createNotification(listOfBusinesses);

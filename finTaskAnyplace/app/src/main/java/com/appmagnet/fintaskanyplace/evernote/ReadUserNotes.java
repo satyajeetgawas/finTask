@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.appmagnet.fintaskanyplace.core.ContentClassifier;
+import com.appmagnet.fintaskanyplace.core.TitleClassifier;
 import com.appmagnet.fintaskanyplace.db.DBContract;
 import com.evernote.client.android.EvernoteSession;
 import com.evernote.client.android.asyncclient.EvernoteNoteStoreClient;
@@ -29,7 +31,7 @@ public class ReadUserNotes {
     private Map notesData;
     private Map notesTitle;
     private EvernoteNoteStoreClient noteStoreClient;
-    final static String  NOTE_START         = "<en-note>";
+    final static String NOTE_START = "<en-note>";
     final static String NOTE_CLOSE = "</en-note>";
     final static String TODO_TAG_START = "<en-todo>";
     final static String TODO_TAG_CLOSE = "</en-todo>";
@@ -45,19 +47,19 @@ public class ReadUserNotes {
 
     }
 
-    private void  queryNotesGuid() throws EDAMUserException, EDAMSystemException, TException, EDAMNotFoundException {
+    private void queryNotesGuid() throws EDAMUserException, EDAMSystemException, TException, EDAMNotFoundException {
 
-            NoteFilter filter = new NoteFilter();
-            NoteList noteList = noteStoreClient.findNotes(filter, 0, 10);
-            if (noteList != null) {
-                List<Note> listOfNotes = noteList.getNotes();
+        NoteFilter filter = new NoteFilter();
+        NoteList noteList = noteStoreClient.findNotes(filter, 0, 10);
+        if (noteList != null) {
+            List<Note> listOfNotes = noteList.getNotes();
 
-                for (Note note : listOfNotes) {
-                    guidList.add(note.getGuid());
-                    notesTitle.put(note.getGuid(),note.getTitle());
+            for (Note note : listOfNotes) {
+                guidList.add(note.getGuid());
+                notesTitle.put(note.getGuid(), note.getTitle());
 
-                }
             }
+        }
     }
 
     private void queryAndProcessNotesRawData() throws EDAMUserException, EDAMSystemException, TException, EDAMNotFoundException {
@@ -69,7 +71,7 @@ public class ReadUserNotes {
             noteData = noteData.replaceAll(NOTE_CLOSE, "");
             noteData = noteData.replaceAll(TODO_TAG_START, "");
             noteData = noteData.replaceAll(TODO_TAG_CLOSE, "");
-            noteData = noteData.replaceAll(NEW_LINE,"");
+            noteData = noteData.replaceAll(NEW_LINE, "");
             noteData = noteData.replaceAll(DIV, "");
             noteData = noteData.replaceAll(DIV_END, ",");
             notesData.put(guid, noteData);
@@ -83,19 +85,48 @@ public class ReadUserNotes {
             queryNotesGuid();
             queryAndProcessNotesRawData();
             for (String guid : guidList) {
-                ContentValues values = new ContentValues();
-                values.put(DBContract.NotesEntry.COLUMN_NAME_TITLE, (String) notesTitle.get(guid));
-                values.put(DBContract.NotesEntry.COLUMN_CONTENT, (String) notesData.get(guid));
-                db.insert(
-                        DBContract.NotesEntry.TABLE_NAME,
-                        null,
-                        values);
-
+                String note_title = (String) notesTitle.get(guid);
+                if (TitleClassifier.isTitleGrocery(note_title)) {
+                   writeToDB(db,note_title,guid,"grocery_or_supermarket",(String)notesData.get(guid));
+                } else if (TitleClassifier.isNoteRequired(note_title)) {
+                    String content = (String) notesData.get(guid);
+                    String[] items = content.split(",");
+                    Map<String, String> itemMap = new HashMap();
+                    for (String item : items) {
+                        String category = ContentClassifier.getCategory(item, activity);
+                        String val = itemMap.get(category);
+                        if (val == null) {
+                            itemMap.put(category, item);
+                        } else {
+                            val += ", " + item;
+                            itemMap.put(category, item);
+                        }
+                    }
+                    for (Map.Entry<String, String> entry : itemMap.entrySet()) {
+                        String category = entry.getKey();
+                        String mappedItems = entry.getValue();
+                        writeToDB(db, note_title, guid, category, mappedItems);
+                    }
+                }
             }
         } catch (Exception e) {
+            db.close();
             throw new Exception("Error while retrieving data from evernote");
 
         }
+        db.close();
+    }
+
+    private void writeToDB(SQLiteDatabase db, String note_title, String guid, String category, String mappedItems) {
+        ContentValues values = new ContentValues();
+        values.put(DBContract.NotesEntry.COLUMN_NAME_TITLE, "Evernote: " + note_title);
+        values.put(DBContract.NotesEntry.COLUMN_NOTE_DATE, (String) notesTitle.get(guid));
+        values.put(DBContract.NotesEntry.COLUMN_CATEGORY, category);
+        values.put(DBContract.NotesEntry.COLUMN_CONTENT, mappedItems);
+        db.insert(
+                DBContract.NotesEntry.TABLE_NAME,
+                null,
+                values);
     }
 
 }

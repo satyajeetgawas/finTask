@@ -1,5 +1,6 @@
 package com.appmagnet.fintaskanyplace.core;
 
+import android.app.Activity;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -15,27 +16,30 @@ import java.util.Map;
  */
 public class ContentClassifier {
 
-  private static Map categoryMap;
-    public static String getCategory(String cont) {
-//        CategoryDBHelper mDbHelper = new CategoryDBHelper(getApplicationContext());
-//        SQLiteDatabase db = mDbHelper.getWritableDatabase();
-//        Cursor c = db.query(
-//                DBContract.NotesEntry.TABLE_NAME,  // The table to query
-//                null,                               // The columns to return
-//                null,                                // The columns for the WHERE clause
-//                null,                            // The values for the WHERE clause
-//                null,                                     // don't group the rows
-//                null,                                     // don't filter by row groups
-//                null                                 // The sort order
+
+
+    public static String getCategory(String cont, Activity activity) {
+        CategoryDBHelper mDbHelper = new CategoryDBHelper(activity.getApplicationContext());
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        String[] returnCol = {DBContract.CategoryEntry.COLUMN_CATEGORY};
+       cont = cont.toLowerCase().trim();
+//        Cursor c = db.query(DBContract.CategoryEntry.TABLE_NAME,
+//               returnCol,
+//                DBContract.CategoryEntry.COLUMN_CONTENTS+"='"+cont+"'",
+//                null,
+//                null,
+//                null,
+//                null,
+//                null
 //        );
-        return null;
+       //cont = "egg";
+        Cursor c = db.rawQuery("SELECT category FROM Category WHERE content = '"+cont+"'",null);
+        c.moveToFirst();
+        int couunt = c.getCount();
+        String category =  c.getString(0);
+        if(c!=null && !c.isClosed())
+            c.close();
+        return category;
     }
 
-    private static Map getCategoryMap(){
-        if(categoryMap == null)
-            categoryMap = new HashMap();
-        categoryMap.put("fish","grocey_or_supermarket");
-
-        return categoryMap;
-    }
 }
