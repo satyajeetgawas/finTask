@@ -99,7 +99,7 @@ public class ReadUserNotes {
                             itemMap.put(category, item);
                         } else {
                             val += ", " + item;
-                            itemMap.put(category, item);
+                            itemMap.put(category, val);
                         }
                     }
                     for (Map.Entry<String, String> entry : itemMap.entrySet()) {

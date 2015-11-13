@@ -35,7 +35,7 @@ public class ContentClassifier {
        //cont = "egg";
         Cursor c = db.rawQuery("SELECT category FROM Category WHERE content = '"+cont+"'",null);
         c.moveToFirst();
-        int couunt = c.getCount();
+        int count = c.getCount();
         String category =  c.getString(0);
         if(c!=null && !c.isClosed())
             c.close();

@@ -73,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onResume(){
         super.onResume();
+        // this is not needed in onCreate() as both of these are called in beginning as well.
         checkAndInitializePrerequisites();
       //  Util.initializeUserSettings(this);
     }

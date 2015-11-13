@@ -152,6 +152,7 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
     }
+
     private void googleCalendarLogin(boolean isChecked) {
         if(isChecked) {
             SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
