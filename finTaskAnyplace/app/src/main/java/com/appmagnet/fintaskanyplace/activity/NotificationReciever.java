@@ -13,6 +13,8 @@ import com.appmagnet.fintaskanyplace.dataobjects.BusinessObject;
 import com.appmagnet.fintaskanyplace.util.Constants;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -26,7 +28,7 @@ public class NotificationReciever extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.result);
-        ArrayList listOfBusiness = getIntent().getParcelableArrayListExtra(Constants.LIST_OF_PLACES);
+        HashMap<String, ArrayList> mapOfBusiness = (HashMap<String, ArrayList>)getIntent().getSerializableExtra(Constants.LIST_OF_PLACES);
         LinearLayout activityLayout = new LinearLayout(this);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -45,14 +47,19 @@ public class NotificationReciever extends AppCompatActivity {
         mOutputText.setVerticalScrollBarEnabled(true);
         mOutputText.setMovementMethod(new ScrollingMovementMethod());
         activityLayout.addView(mOutputText);
-
-        setContentView(activityLayout);
         ArrayList listOfPlaces = new ArrayList<>();
-        for(Object businessObject : listOfBusiness){
-            String temp = ((BusinessObject)businessObject).getBusinessName()+" "+((BusinessObject)businessObject).getBusinessRating();
-            listOfPlaces.add(temp);
+        setContentView(activityLayout);
+        for (HashMap.Entry<String, ArrayList> entry : mapOfBusiness.entrySet()) {
+            ArrayList listOfBusiness = entry.getValue();
 
+            listOfPlaces.add(entry.getKey());
+            for(Object businessObject : listOfBusiness){
+                String temp = ((BusinessObject)businessObject).getBusinessName()+" "+((BusinessObject)businessObject).getBusinessRating();
+                listOfPlaces.add(temp);
+
+            }
         }
+
         mOutputText.setText(TextUtils.join("\n", listOfPlaces));
     }
 

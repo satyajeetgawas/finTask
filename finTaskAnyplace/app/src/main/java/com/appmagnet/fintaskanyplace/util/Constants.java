@@ -16,5 +16,6 @@ public interface Constants {
     String PROXIMITY_RADIUS = "PROXIMITY_RADIUS";
     String REFRESH_RATE = "REFRESH_RATE";
     String LIST_OF_PLACES = "LIST_OF_PLACES" ;
+    String UNCATEGORIZED = "Uncategorized";
     //public static long REFRESH_RATE = 30000;
 }

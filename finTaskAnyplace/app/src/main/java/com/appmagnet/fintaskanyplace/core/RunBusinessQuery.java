@@ -5,14 +5,19 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.appmagnet.fintaskanyplace.R;
+import com.appmagnet.fintaskanyplace.activity.MainActivity;
 import com.appmagnet.fintaskanyplace.activity.NotificationReciever;
 import com.appmagnet.fintaskanyplace.dataobjects.BusinessObject;
+import com.appmagnet.fintaskanyplace.db.DBContract;
+import com.appmagnet.fintaskanyplace.db.NotesDBHelper;
 import com.appmagnet.fintaskanyplace.googleservices.GooglePlacesApi;
 import com.appmagnet.fintaskanyplace.initializer.LocationHandler;
 import com.appmagnet.fintaskanyplace.util.Constants;
@@ -20,36 +25,36 @@ import com.appmagnet.fintaskanyplace.util.Util;
 import com.appmagnet.fintaskanyplace.yelp.YelpAPI;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by satyajeet and anmol on 11/6/2015.
  */
-public class RunBusinessQuery extends AsyncTask<Context, Void, ArrayList<BusinessObject>> {
+public class RunBusinessQuery extends AsyncTask<Context, Void, HashMap<String, ArrayList>> {
     Context context;
 
     @Override
-    protected ArrayList<BusinessObject> doInBackground(Context[] params) {
+    protected HashMap<String , ArrayList> doInBackground(Context[] params) {
         context = params[0];
         return runTheSearchQuery();
     }
 
     @Override
-    protected void onPostExecute(ArrayList<BusinessObject> listOfBusinesses) {
-        ArrayList<String> businessNames = new ArrayList<>();  //for debuging later create a notification
-        for (BusinessObject busObj : listOfBusinesses) {
-            businessNames.add(busObj.getBusinessName() + ", " + busObj.getBusinessRating());
-        }
-        if ( businessNames.size()>0) {
+    protected void onPostExecute(HashMap<String, ArrayList> mapOfBusinesses) {
+         //for debuging later create a notification
+
+        if ( mapOfBusinesses.size()>0) {
 //           String businessesCon = TextUtils.join("\n", businessNames);
 //           Toast.makeText(context, businessesCon, Toast.LENGTH_LONG).show();
-            createNotification(listOfBusinesses);
+            createNotification(mapOfBusinesses);
         }
     }
 
-    private ArrayList<BusinessObject> runTheSearchQuery() {
+    private HashMap runTheSearchQuery() {
 
         LocationHandler lh = LocationHandler.getInstance();
-        ArrayList<BusinessObject> listOfBusinesses = new ArrayList<BusinessObject>();
+        HashMap categoryBusMap = new HashMap<String, ArrayList>();
 
         if (lh != null && lh.isLocationEnabled()) {
             if (lh.getLocationMap().get(LocationHandler.LATITUDE) != null) {
@@ -63,26 +68,39 @@ public class RunBusinessQuery extends AsyncTask<Context, Void, ArrayList<Busines
             terms and identify which task can be completed based on the user settings like radius
             and minimum rating
              */
-                String term = "grocery_or_supermarket"; //this term will be obtained from the saved(cached) file which is
+                NotesDBHelper mDbHelper = new NotesDBHelper(context);
+                SQLiteDatabase db = mDbHelper.getWritableDatabase();
+                Cursor c = db.rawQuery("SELECT DISTINCT category FROM Notes", null);
+                //String term = "grocery_or_supermarket"; //this term will be obtained from the saved(cached) file which is
                 //generated or refreshed once daily
-                if(Boolean.parseBoolean(Util.getSettings(context, Constants.YELP_PREF))){
-                    YelpAPI yelpApi = new YelpAPI();
-                    listOfBusinesses.addAll(yelpApi.searchForBusinessesByLocation(term, location));
+
+                if(c.moveToFirst()) {
+                    do {
+                        ArrayList<BusinessObject> listOfBusinesses = new ArrayList<BusinessObject>();
+                        String term = c.getString(c.getColumnIndex(DBContract.NotesEntry.COLUMN_CATEGORY));
+                        //if(Constants.UNCATEGORIZED.equals(term)) {
+                        if (Boolean.parseBoolean(Util.getSettings(context, Constants.YELP_PREF))) {
+                            YelpAPI yelpApi = new YelpAPI();
+                            listOfBusinesses.addAll(yelpApi.searchForBusinessesByLocation(term, location));
+                        }
+                        if (Boolean.parseBoolean(Util.getSettings(context, Constants.GOOGLE_PLACES_PREF))) {
+                            GooglePlacesApi googlePlaces = new GooglePlacesApi();
+                            listOfBusinesses.addAll(googlePlaces.searchForBusinessesByLocation(term, location));
+                        }
+                        if(listOfBusinesses.size() > 0)
+                            categoryBusMap.put(term, listOfBusinesses);
+                    }   while(c.moveToNext());
                 }
-                if(Boolean.parseBoolean(Util.getSettings(context, Constants.GOOGLE_PLACES_PREF))){
-                    GooglePlacesApi googlePlaces = new GooglePlacesApi();
-                    listOfBusinesses.addAll(googlePlaces.searchForBusinessesByLocation(term, location));
                 }
             }
-        }
-        return listOfBusinesses;
+        return categoryBusMap;
     }
 
-    private void createNotification(ArrayList listOfBusinessPlaces) {
+    private void createNotification(HashMap mapOfBusinessPlaces) {
         // Prepare intent which is triggered if the
         // notification is selected
         Intent intent = new Intent(context, NotificationReciever.class);
-        intent.putExtra(Constants.LIST_OF_PLACES,listOfBusinessPlaces);
+        intent.putExtra(Constants.LIST_OF_PLACES,mapOfBusinessPlaces);
         PendingIntent pIntent = PendingIntent.getActivity(context, (int) System.currentTimeMillis(), intent, 0);
 
         // Build notification

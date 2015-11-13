@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name"><italics>fin</italics>i>TaskAnyplace</string>
+    <string name="app_name"><i>fin</i>TaskAnyplace</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>

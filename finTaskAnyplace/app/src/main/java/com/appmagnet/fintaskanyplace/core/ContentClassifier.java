@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import com.appmagnet.fintaskanyplace.db.CategoryDBHelper;
 import com.appmagnet.fintaskanyplace.db.DBContract;
 import com.appmagnet.fintaskanyplace.db.NotesDBHelper;
+import com.appmagnet.fintaskanyplace.util.Constants;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,7 +37,12 @@ public class ContentClassifier {
         Cursor c = db.rawQuery("SELECT category FROM Category WHERE content = '"+cont+"'",null);
         c.moveToFirst();
         int count = c.getCount();
-        String category =  c.getString(0);
+        String category = "";
+        if(count != 0) {
+            category = c.getString(0);
+        } else {
+            category = Constants.UNCATEGORIZED;
+        }
         if(c!=null && !c.isClosed())
             c.close();
         return category;

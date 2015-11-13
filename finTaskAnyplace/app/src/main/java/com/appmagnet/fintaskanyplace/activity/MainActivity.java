@@ -18,11 +18,14 @@ import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ExpandableListView;
 import android.widget.Toast;
 
 import com.appmagnet.fintaskanyplace.R;
 import com.appmagnet.fintaskanyplace.backgroundtasks.BackgroundTaskReceiver;
 import com.appmagnet.fintaskanyplace.core.RefreshCachedNotesDB;
+import com.appmagnet.fintaskanyplace.dataobjects.NoteObject;
 import com.appmagnet.fintaskanyplace.db.DBContract;
 import com.appmagnet.fintaskanyplace.db.NotesDBHelper;
 import com.appmagnet.fintaskanyplace.evernote.ReadUserNotes;
@@ -36,6 +39,7 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -44,7 +48,10 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private LocationHandler locHandle;
-
+    ExpandableListAdapter listAdapter;
+    ExpandableListView expListView;
+    List<String> listDataHeader;
+    HashMap<String, List<String>> listDataChild;
 
     public BackgroundTaskReceiver backgroundTaskReceiver;
     @Override
@@ -162,6 +169,37 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void createUI() {
+        // get the listview
+        expListView = (ExpandableListView) findViewById(R.id.lvExp);
+
+        // preparing list data
+        //prepareListData()
+
+
+        listAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild);
+
+        // setting list adapter
+        expListView.setAdapter(listAdapter);
+
+        // Listview on child click listener
+        expListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+
+            @Override
+            public boolean onChildClick(ExpandableListView parent, View v,
+                                        int groupPosition, int childPosition, long id) {
+                Toast.makeText(
+                        getApplicationContext(),
+                        listDataHeader.get(groupPosition)
+                                + " : "
+                                + listDataChild.get(
+                                listDataHeader.get(groupPosition)).get(
+                                childPosition), Toast.LENGTH_SHORT)
+                        .show();
+                return false;
+            }
+        });
+    }
 
     public void showPostDBWrite() {
 
@@ -177,12 +215,23 @@ public class MainActivity extends AppCompatActivity {
                 null                                 // The sort order
         );
 
-        String text = "";
+        listDataHeader = new ArrayList<String>();
+        listDataChild = new HashMap<String, List<String>>();
+
         if (c.moveToFirst()) {
             do {
-                text += c.getString(c.getColumnIndex(DBContract.NotesEntry.COLUMN_NAME_TITLE)) +" "+
-                        c.getString(c.getColumnIndex(DBContract.NotesEntry.COLUMN_CATEGORY )) + " "+
-                                c.getString(c.getColumnIndex(DBContract.NotesEntry.COLUMN_CONTENT)) + "\n";
+                NoteObject obj = new NoteObject(c);
+                if(listDataChild.get(obj.getNoteType()) == null){
+                    ArrayList listOfNotes = new ArrayList();
+                    listOfNotes.add(obj.getFormattedString());
+                    listDataHeader.add(obj.getNoteType());
+                    listDataChild.put(obj.getNoteType(),listOfNotes);
+                }else
+                {
+                    ArrayList list = (ArrayList) listDataChild.get(obj.getNoteType());
+                    list.add(obj.getFormattedString());
+                    listDataChild.put(obj.getNoteType(),list);
+                }
 
             }
             while (c.moveToNext());
@@ -190,7 +239,7 @@ public class MainActivity extends AppCompatActivity {
         if (c != null && !c.isClosed())
             c.close();
 
-        Toast.makeText(getApplicationContext(), text, Toast.LENGTH_LONG).show();
+        createUI();
 
     }
 }
