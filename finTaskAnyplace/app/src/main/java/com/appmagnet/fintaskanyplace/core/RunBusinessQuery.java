@@ -87,6 +87,22 @@ public class RunBusinessQuery extends AsyncTask<Context, Void, HashMap<String, A
                             GooglePlacesApi googlePlaces = new GooglePlacesApi();
                             listOfBusinesses.addAll(googlePlaces.searchForBusinessesByLocation(term, location));
                         }
+
+                        for(int a=0;a<listOfBusinesses.size();a++){
+                            for(int b=a+1;b<listOfBusinesses.size();b++){
+                                    if(listOfBusinesses.get(a).getBusinessName().equalsIgnoreCase(listOfBusinesses.get(b).getBusinessName())){
+                                    Double longa = new Double(listOfBusinesses.get(a).getBusinessLongitude());
+                                    Double longb = new Double(listOfBusinesses.get(b).getBusinessLongitude());
+                                    Double lata = new Double(listOfBusinesses.get(a).getBusinessLatitude());
+                                    Double latb = new Double(listOfBusinesses.get(b).getBusinessLatitude());
+                                    if(  Math.abs(longa - longb) < 1 && Math.abs(lata - latb) < 1) {
+                                        listOfBusinesses.remove(b);
+                                        b--;
+                                    }
+                                }
+                            }
+                        }
+
                         if(listOfBusinesses.size() > 0)
                             categoryBusMap.put(term, listOfBusinesses);
                     }   while(c.moveToNext());

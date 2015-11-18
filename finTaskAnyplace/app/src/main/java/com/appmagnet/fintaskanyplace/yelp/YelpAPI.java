@@ -85,8 +85,9 @@ public class YelpAPI {
                     Map<String,String> busProp = new HashMap<String,String>();
                     busProp.put( BusinessObject.NAME , business.getString("name"));
                     busProp.put( BusinessObject.RATING , business.getString("rating"));
-                  //  busProp.put( BusinessObject.LATITUDE , business.getString("location.coordinate.latitude"));
-                  //  busProp.put( BusinessObject.LONGITUDE ,  business.getString("location.coordinate.longitude"));
+                    busProp.put( BusinessObject.LATITUDE , business.getJSONObject("location").getJSONObject("coordinate").getString("latitude"));
+                    busProp.put( BusinessObject.LONGITUDE, business.getJSONObject("location").getJSONObject("coordinate").getString("longitude"));
+           //         business.getString("location.coordinate.longitude"));
                     listPlaces.add(new BusinessObject(busProp));
                 } catch (JSONException e) {
                     e.printStackTrace();
