@@ -8,11 +8,13 @@ import java.util.HashMap;
 import java.util.List;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.appmagnet.fintaskanyplace.R;
@@ -55,7 +57,9 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
         TextView txtListChild = (TextView) convertView
                 .findViewById(R.id.lblListItem);
-
+        if(childText.startsWith("Evernote")){
+            txtListChild.setBackgroundColor(0xFF6FB536);
+        }
         txtListChild.setText(childText);
         return convertView;
     }
@@ -85,11 +89,15 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     public View getGroupView(int groupPosition, boolean isExpanded,
                              View convertView, ViewGroup parent) {
         String headerTitle = (String) getGroup(groupPosition);
+
         if (convertView == null) {
             LayoutInflater infalInflater = (LayoutInflater) this._context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = infalInflater.inflate(R.layout.list_group, null);
         }
+        Button groupButton = (Button)convertView.findViewById(R.id.button);
+        groupButton.setFocusable(false);
+
 
         TextView lblListHeader = (TextView) convertView
                 .findViewById(R.id.lblListHeader);

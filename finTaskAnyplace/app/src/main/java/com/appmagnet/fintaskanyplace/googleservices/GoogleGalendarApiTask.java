@@ -75,6 +75,7 @@ public class GoogleGalendarApiTask  {
             ContentValues values = new ContentValues();
             values.put(DBContract.NotesEntry.COLUMN_NAME_TITLE, "google calendar");
             values.put(DBContract.NotesEntry.COLUMN_CONTENT, event);
+            values.put(DBContract.NotesEntry.COLUMN_CATEGORY,"birthday gift");
             db.insert(
                     DBContract.NotesEntry.TABLE_NAME,
                     null,

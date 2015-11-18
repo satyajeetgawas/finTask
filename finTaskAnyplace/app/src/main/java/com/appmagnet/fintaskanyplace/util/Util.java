@@ -25,11 +25,6 @@ public final class Util {
         return SEARCH_LIMIT;
     }
 
-    public static void logout(Activity activity) {
-        EvernoteSession.getInstance().logOut();
-        activity.finish();
-    }
-
     public static String getRadius(){
         return PROXIMITY_RADIUS_VAL;
     }

@@ -1,6 +1,7 @@
 package com.appmagnet.fintaskanyplace.activity;
 
 import android.accounts.AccountManager;
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -17,6 +18,7 @@ import com.appmagnet.fintaskanyplace.R;
 import com.appmagnet.fintaskanyplace.util.Constants;
 import com.appmagnet.fintaskanyplace.util.Util;
 import com.evernote.client.android.EvernoteSession;
+import com.evernote.client.android.login.EvernoteLoginFragment;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
@@ -27,7 +29,7 @@ import java.util.Arrays;
 /**
  * Created by satyajeet and anmol on 10/21/2015.
  */
-public class SettingsActivity extends AppCompatActivity {
+public class SettingsActivity extends AppCompatActivity implements EvernoteLoginFragment.ResultCallback {
 
     GoogleAccountCredential mCredential;
     static final int REQUEST_ACCOUNT_PICKER = 1000;
@@ -35,6 +37,7 @@ public class SettingsActivity extends AppCompatActivity {
     static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
     int radius, refresh_rate;
     private Switch googleCalendarSwitch;
+    private Switch evernoteSwitch;
 
 
 
@@ -42,6 +45,16 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+        evernoteSwitch  = (Switch) findViewById(R.id.switch_evernote);
+        evernoteSwitch.setChecked(false);
+        evernoteSwitch.setChecked(EvernoteSession.getInstance() != null && EvernoteSession.getInstance().isLoggedIn());
+        evernoteSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                evernoteLogin(isChecked);
+            }
+        });
+
     }
 
     @Override
@@ -69,15 +82,6 @@ public class SettingsActivity extends AppCompatActivity {
         SeekBar seek_ref = (SeekBar) findViewById(R.id.refreshSeekBarID);
         seek_ref.setProgress(new Integer(b));
 
-        Switch evernoteSwitch = (Switch) findViewById(R.id.switch_evernote);
-        evernoteSwitch.setChecked(false);
-        evernoteSwitch.setChecked(EvernoteSession.getInstance() != null && EvernoteSession.getInstance().isLoggedIn());
-        evernoteSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                evernoteLogin(isChecked);
-            }
-        });
 
         googleCalendarSwitch = (Switch) findViewById(R.id.switch_google_calendar);
         googleCalendarSwitch.setChecked(!"0".equals(Util.getSettings(this, Constants.PREF_ACCOUNT_NAME)));
@@ -89,7 +93,11 @@ public class SettingsActivity extends AppCompatActivity {
         });
 
         Switch yelpApiSwitch = (Switch) findViewById(R.id.switch_yelp);
-        yelpApiSwitch.setChecked(Boolean.parseBoolean(Util.getSettings(this, Constants.YELP_PREF)));
+        if("0".equals(Util.getSettings(this, Constants.YELP_PREF))){
+            yelpApiSwitch.setChecked(true);
+            setSetting(Constants.YELP_PREF, String.valueOf(true));
+        }else
+            yelpApiSwitch.setChecked(Boolean.parseBoolean(Util.getSettings(this, Constants.YELP_PREF)));
         yelpApiSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -98,7 +106,11 @@ public class SettingsActivity extends AppCompatActivity {
         });
 
         Switch googlePlacesSwitch = (Switch) findViewById(R.id.switch_google_places);
-        googlePlacesSwitch.setChecked(Boolean.parseBoolean(Util.getSettings(this, Constants.GOOGLE_PLACES_PREF)));
+        if("0".equals(Util.getSettings(this, Constants.GOOGLE_PLACES_PREF))){
+            googlePlacesSwitch.setChecked(true);
+            setSetting(Constants.GOOGLE_PLACES_PREF, String.valueOf(true));
+        }else
+            googlePlacesSwitch.setChecked(Boolean.parseBoolean(Util.getSettings(this, Constants.GOOGLE_PLACES_PREF)));
         googlePlacesSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -171,10 +183,11 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void evernoteLogin(boolean isChecked) {
         if(isChecked)
-            EvernoteSession.getInstance().authenticate(this);
+            EvernoteSession.getInstance().authenticate(SettingsActivity.this);
         else
-            Util.logout(this);
+            EvernoteSession.getInstance().logOut();
     }
+
 
 
 
@@ -221,6 +234,9 @@ public class SettingsActivity extends AppCompatActivity {
                     chooseAccount();
                 }
                 break;
+
+
+
         }
 
         super.onActivityResult(requestCode, resultCode, data);
@@ -253,6 +269,11 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
 
-
-
+    @Override
+    public void onLoginFinished(boolean successful) {
+        if(successful)
+            evernoteSwitch.setChecked(true);
+        else
+            evernoteSwitch.setChecked(false);
+    }
 }

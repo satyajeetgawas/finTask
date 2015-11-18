@@ -37,21 +37,20 @@ public class Initializer extends Application {
     public void onCreate() {
     super.onCreate();
         //Set up the Evernote singleton session, use EvernoteSession.getInstance() later
-        new EvernoteSession.Builder(this)
-                .setEvernoteService(EVERNOTE_SERVICE)
-                .setSupportAppLinkedNotebooks(SUPPORT_APP_LINKED_NOTEBOOKS)
-                .setForceAuthenticationInThirdPartyApp(true)
-//                .setLocale(Locale.SIMPLIFIED_CHINESE)
-                .build(ApiKeys.EVERNOTE_CONSUMER_KEY, ApiKeys.EVERNOTE_CONSUMER_SECRET)
-                .asSingleton();
+        createEvernoteSession();
+        generateCategoryDB();
 
 
+
+
+    }
+
+    private void generateCategoryDB() {
         CategoryDBHelper dbHelper = new CategoryDBHelper(this);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         Cursor c = db.query(DBContract.CategoryEntry.TABLE_NAME,
-                null,null,null,null,null,null );
+                null, null, null, null, null, null);
         if (c.getCount() == 0) {
-            Toast.makeText(getApplicationContext(), "No Bloat", Toast.LENGTH_LONG).show();
             Map<String, ArrayList> categoryMap = read();
             for (Map.Entry<String, ArrayList> entry : categoryMap.entrySet()) {
                 String key = entry.getKey();
@@ -65,15 +64,22 @@ public class Initializer extends Application {
             }
 
         }
-        if(c!=null && !c.isClosed())
-        {
+        if (c != null && !c.isClosed()) {
             c.close();
             db.close();
         }
     }
 
 
-
+    private void createEvernoteSession(){
+        new EvernoteSession.Builder(this)
+                .setEvernoteService(EVERNOTE_SERVICE)
+                .setSupportAppLinkedNotebooks(SUPPORT_APP_LINKED_NOTEBOOKS)
+                .setForceAuthenticationInThirdPartyApp(true)
+//                .setLocale(Locale.SIMPLIFIED_CHINESE)
+                .build(ApiKeys.EVERNOTE_CONSUMER_KEY, ApiKeys.EVERNOTE_CONSUMER_SECRET)
+                .asSingleton();
+    }
 
     public Map read(){
         InputStream inputStream = getResources().openRawResource(R.raw.category);

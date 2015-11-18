@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
     ExpandableListView expListView;
     List<String> listDataHeader;
     HashMap<String, List<String>> listDataChild;
+    private static boolean showDialog = true;
 
     public BackgroundTaskReceiver backgroundTaskReceiver;
     @Override
@@ -64,9 +65,8 @@ public class MainActivity extends AppCompatActivity {
         Context context = this.getApplicationContext();
         backgroundTaskReceiver.doInBackground(context);
 
-        RefreshCachedNotesDB dbTask = new RefreshCachedNotesDB(this);
-        dbTask.execute();
-        Toast.makeText(getApplicationContext(), "DB writing started", Toast.LENGTH_SHORT).show();
+
+
 
 
 
@@ -80,9 +80,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onResume(){
         super.onResume();
-        // this is not needed in onCreate() as both of these are called in beginning as well.
         checkAndInitializePrerequisites();
-      //  Util.initializeUserSettings(this);
+        showPostDBWrite();
+        RefreshCachedNotesDB dbTask = new RefreshCachedNotesDB(this);
+        dbTask.execute();
+
     }
 
     @Override
@@ -106,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void checkAndInitializePrerequisites() {
         locHandle= new LocationHandler(this);
-
+        boolean is = EvernoteSession.getInstance()==null || !EvernoteSession.getInstance().isLoggedIn();
         if ((EvernoteSession.getInstance()==null || !EvernoteSession.getInstance().isLoggedIn()) &&
                 "0".equals(Util.getSettings(this, Constants.PREF_ACCOUNT_NAME)))
         {
@@ -118,7 +120,6 @@ public class MainActivity extends AppCompatActivity {
         }
         else
             showTaskList();
-
 
     }
 
