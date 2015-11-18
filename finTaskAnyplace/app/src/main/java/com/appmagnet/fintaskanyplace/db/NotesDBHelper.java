@@ -14,7 +14,7 @@ public class NotesDBHelper extends SQLiteOpenHelper {
     private static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE " + DBContract.NotesEntry.TABLE_NAME + " (" +
                     DBContract.NotesEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT DEFAULT 1 ," +
-                    DBContract.NotesEntry.COLUMN_NAME_ENTRY_ID + TEXT_TYPE + COMMA_SEP +
+                    DBContract.NotesEntry.NOTE_ID + TEXT_TYPE + COMMA_SEP +
                     DBContract.NotesEntry.COLUMN_NAME_TITLE + TEXT_TYPE + COMMA_SEP +
                     DBContract.NotesEntry.COLUMN_CONTENT + TEXT_TYPE + COMMA_SEP +
                     DBContract.NotesEntry.COLUMN_CATEGORY + TEXT_TYPE + COMMA_SEP +

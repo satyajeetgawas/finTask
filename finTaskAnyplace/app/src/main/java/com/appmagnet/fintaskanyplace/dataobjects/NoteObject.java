@@ -13,12 +13,15 @@ public class NoteObject {
     private String noteTitle;
     private String noteDate;
     private String noteContent;
+    private String noteGuid;
 
     public NoteObject(Cursor c) {
         noteTitle = c.getString(c.getColumnIndex(DBContract.NotesEntry.COLUMN_NAME_TITLE));
         noteType = c.getString(c.getColumnIndex(DBContract.NotesEntry.COLUMN_CATEGORY ));
         noteDate = "Nov 13, 2015";
         noteContent = c.getString(c.getColumnIndex(DBContract.NotesEntry.COLUMN_CONTENT));
+        noteGuid = c.getString(c.getColumnIndex(DBContract.NotesEntry.NOTE_ID));
+
     }
 
     public String getFormattedString() {
@@ -32,4 +35,7 @@ public class NoteObject {
     }
 
 
+    public String getGuid() {
+        return noteGuid;
+    }
 }

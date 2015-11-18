@@ -1,9 +1,6 @@
 package com.appmagnet.fintaskanyplace.activity;
 
 import android.app.Dialog;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,14 +8,11 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.Toast;
 
@@ -28,15 +22,11 @@ import com.appmagnet.fintaskanyplace.core.RefreshCachedNotesDB;
 import com.appmagnet.fintaskanyplace.dataobjects.NoteObject;
 import com.appmagnet.fintaskanyplace.db.DBContract;
 import com.appmagnet.fintaskanyplace.db.NotesDBHelper;
-import com.appmagnet.fintaskanyplace.evernote.ReadUserNotes;
 import com.appmagnet.fintaskanyplace.initializer.LocationHandler;
+import com.appmagnet.fintaskanyplace.ui.ExpandableListAdapter;
 import com.appmagnet.fintaskanyplace.util.Constants;
 import com.appmagnet.fintaskanyplace.util.Util;
 import com.evernote.client.android.EvernoteSession;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
     ExpandableListAdapter listAdapter;
     ExpandableListView expListView;
     List<String> listDataHeader;
-    HashMap<String, List<String>> listDataChild;
+    HashMap<String, List<NoteObject>> listDataChild;
     private static boolean showDialog = true;
 
     public BackgroundTaskReceiver backgroundTaskReceiver;
@@ -182,24 +172,13 @@ public class MainActivity extends AppCompatActivity {
 
         // setting list adapter
         expListView.setAdapter(listAdapter);
+        for(int i=0;i<expListView.getHeaderViewsCount();i++){
+            expListView.expandGroup(i);
+        }
 
-        // Listview on child click listener
-        expListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
 
-            @Override
-            public boolean onChildClick(ExpandableListView parent, View v,
-                                        int groupPosition, int childPosition, long id) {
-                Toast.makeText(
-                        getApplicationContext(),
-                        listDataHeader.get(groupPosition)
-                                + " : "
-                                + listDataChild.get(
-                                listDataHeader.get(groupPosition)).get(
-                                childPosition), Toast.LENGTH_SHORT)
-                        .show();
-                return false;
-            }
-        });
+
+
     }
 
     public void showPostDBWrite() {
@@ -217,20 +196,20 @@ public class MainActivity extends AppCompatActivity {
         );
 
         listDataHeader = new ArrayList<String>();
-        listDataChild = new HashMap<String, List<String>>();
+        listDataChild = new HashMap<String, List<NoteObject>>();
 
         if (c.moveToFirst()) {
             do {
                 NoteObject obj = new NoteObject(c);
                 if(listDataChild.get(obj.getNoteType()) == null){
-                    ArrayList listOfNotes = new ArrayList();
-                    listOfNotes.add(obj.getFormattedString());
+                    ArrayList listOfNoteObj = new ArrayList();
+                    listOfNoteObj.add(obj);
                     listDataHeader.add(obj.getNoteType());
-                    listDataChild.put(obj.getNoteType(),listOfNotes);
+                    listDataChild.put(obj.getNoteType(),listOfNoteObj);
                 }else
                 {
                     ArrayList list = (ArrayList) listDataChild.get(obj.getNoteType());
-                    list.add(obj.getFormattedString());
+                    list.add(obj);
                     listDataChild.put(obj.getNoteType(),list);
                 }
 

@@ -1,4 +1,4 @@
-package com.appmagnet.fintaskanyplace.activity;
+package com.appmagnet.fintaskanyplace.ui;
 
 /**
  * Created by anmolgupta on 11/13/15.
@@ -18,15 +18,18 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.appmagnet.fintaskanyplace.R;
+import com.appmagnet.fintaskanyplace.activity.MainActivity;
+import com.appmagnet.fintaskanyplace.dataobjects.NoteObject;
+import com.appmagnet.fintaskanyplace.ui.DeleteButtonLisener;
 
 public class ExpandableListAdapter extends BaseExpandableListAdapter {
     private Context _context;
     private List<String> _listDataHeader; // header titles
     // child data in format of header title, child title
-    private HashMap<String, List<String>> _listDataChild;
+    private HashMap<String, List<NoteObject>> _listDataChild;
 
     public ExpandableListAdapter(Context context, List<String> listDataHeader,
-                                 HashMap<String, List<String>> listChildData) {
+                                 HashMap<String, List<NoteObject>> listChildData) {
         this._context = context;
         this._listDataHeader = listDataHeader;
         this._listDataChild = listChildData;
@@ -47,7 +50,9 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     public View getChildView(int groupPosition, final int childPosition,
                              boolean isLastChild, View convertView, ViewGroup parent) {
 
-        final String childText = (String) getChild(groupPosition, childPosition);
+        NoteObject noteObj = (NoteObject)getChild(groupPosition, childPosition);
+
+        final String childText = (String) noteObj.getFormattedString();
 
         if (convertView == null) {
             LayoutInflater infalInflater = (LayoutInflater) this._context
@@ -58,8 +63,17 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         TextView txtListChild = (TextView) convertView
                 .findViewById(R.id.lblListItem);
         if(childText.startsWith("Evernote")){
-            txtListChild.setBackgroundColor(0xFF6FB536);
+            convertView.setBackgroundColor(0xFF6FB536);
         }
+        Button deleteButton = (Button)convertView.findViewById(R.id.delete_button);
+        deleteButton.setFocusable(false);
+        deleteButton.setOnClickListener(new DeleteButtonLisener(this,_context,noteObj));
+
+
+        Button searchNearbyBtn = (Button)convertView.findViewById(R.id.search_nearby_btn);
+        searchNearbyBtn.setFocusable(false);
+        searchNearbyBtn.setOnClickListener(new SearchNearbyBtnListener(_context, noteObj));
+
         txtListChild.setText(childText);
         return convertView;
     }
@@ -115,5 +129,11 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     @Override
     public boolean isChildSelectable(int groupPosition, int childPosition) {
         return true;
+    }
+
+    public void removeChild(NoteObject obj){
+        _listDataChild.get(obj.getNoteType()).remove(obj);
+        ((MainActivity)_context).createUI();
+
     }
 }

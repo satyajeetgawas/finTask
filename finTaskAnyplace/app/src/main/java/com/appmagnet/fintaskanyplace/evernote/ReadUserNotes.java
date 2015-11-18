@@ -119,6 +119,7 @@ public class ReadUserNotes {
 
     private void writeToDB(SQLiteDatabase db, String note_title, String guid, String category, String mappedItems) {
         ContentValues values = new ContentValues();
+        values.put(DBContract.NotesEntry.NOTE_ID,  guid);
         values.put(DBContract.NotesEntry.COLUMN_NAME_TITLE, "Evernote: " + note_title);
         values.put(DBContract.NotesEntry.COLUMN_NOTE_DATE, (String) notesTitle.get(guid));
         values.put(DBContract.NotesEntry.COLUMN_CATEGORY, category);

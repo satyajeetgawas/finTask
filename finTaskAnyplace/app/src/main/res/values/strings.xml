@@ -15,5 +15,7 @@
     <string name="search_engine">Search Results From</string>
     <string name="notification_msg">Some task can be completed based on your location. Click to view</string>
     <string name="preferences">Preferences</string>
+    <string name="delete">Delete</string>
+    <string name="search_nearby">Search Nearby</string>
 
 </resources>
