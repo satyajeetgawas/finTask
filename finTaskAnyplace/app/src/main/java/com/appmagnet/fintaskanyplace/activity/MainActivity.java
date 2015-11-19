@@ -19,6 +19,7 @@ import android.widget.Toast;
 import com.appmagnet.fintaskanyplace.R;
 import com.appmagnet.fintaskanyplace.backgroundtasks.BackgroundTaskReceiver;
 import com.appmagnet.fintaskanyplace.core.RefreshCachedNotesDB;
+import com.appmagnet.fintaskanyplace.dataobjects.BusinessObject;
 import com.appmagnet.fintaskanyplace.dataobjects.NoteObject;
 import com.appmagnet.fintaskanyplace.db.DBContract;
 import com.appmagnet.fintaskanyplace.db.NotesDBHelper;
@@ -31,12 +32,14 @@ import com.evernote.client.android.EvernoteSession;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by satyajeet and anmol on 10/12/2015.
  */
 public class MainActivity extends AppCompatActivity {
 
+    private boolean isNotificationCall;
     private LocationHandler locHandle;
     ExpandableListAdapter listAdapter;
     ExpandableListView expListView;
@@ -50,12 +53,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
 
-
         backgroundTaskReceiver = new BackgroundTaskReceiver();
         Context context = this.getApplicationContext();
         backgroundTaskReceiver.doInBackground(context);
-
-
 
 
 
@@ -74,7 +74,6 @@ public class MainActivity extends AppCompatActivity {
         showPostDBWrite();
         RefreshCachedNotesDB dbTask = new RefreshCachedNotesDB(this);
         dbTask.execute();
-
     }
 
     @Override
@@ -198,21 +197,21 @@ public class MainActivity extends AppCompatActivity {
         listDataHeader = new ArrayList<String>();
         listDataChild = new HashMap<String, List<NoteObject>>();
 
+
         if (c.moveToFirst()) {
             do {
                 NoteObject obj = new NoteObject(c);
-                if(listDataChild.get(obj.getNoteType()) == null){
-                    ArrayList listOfNoteObj = new ArrayList();
-                    listOfNoteObj.add(obj);
-                    listDataHeader.add(obj.getNoteType());
-                    listDataChild.put(obj.getNoteType(),listOfNoteObj);
-                }else
-                {
-                    ArrayList list = (ArrayList) listDataChild.get(obj.getNoteType());
-                    list.add(obj);
-                    listDataChild.put(obj.getNoteType(),list);
-                }
 
+                    if (listDataChild.get(obj.getNoteType()) == null) {
+                        ArrayList listOfNoteObj = new ArrayList();
+                        listOfNoteObj.add(obj);
+                        listDataHeader.add(obj.getNoteType());
+                        listDataChild.put(obj.getNoteType(), listOfNoteObj);
+                    } else {
+                        ArrayList list = (ArrayList) listDataChild.get(obj.getNoteType());
+                        list.add(obj);
+                        listDataChild.put(obj.getNoteType(), list);
+                    }
             }
             while (c.moveToNext());
         }

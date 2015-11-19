@@ -64,10 +64,10 @@ public class YelpAPI {
         request.addQuerystringParameter("limit", Util.getSearchLimit());
         request.addQuerystringParameter("radius_limit", Util.getRadius());
         String responseJsonString = sendRequestAndGetResponse(request);
-        return getBusinessObjectsFromJson(responseJsonString);
+        return getBusinessObjectsFromJson(responseJsonString,term);
     }
 
-    private ArrayList<BusinessObject> getBusinessObjectsFromJson(String responseJsonString) {
+    private ArrayList<BusinessObject> getBusinessObjectsFromJson(String responseJsonString, String cat ) {
         ArrayList<BusinessObject> listPlaces = null;
         JSONObject json = null;
         JSONArray businesses = null;
@@ -87,6 +87,7 @@ public class YelpAPI {
                     busProp.put( BusinessObject.RATING , business.getString("rating"));
                     busProp.put( BusinessObject.LATITUDE , business.getJSONObject("location").getJSONObject("coordinate").getString("latitude"));
                     busProp.put( BusinessObject.LONGITUDE, business.getJSONObject("location").getJSONObject("coordinate").getString("longitude"));
+                    busProp.put(BusinessObject.CATEGORY,cat);
            //         business.getString("location.coordinate.longitude"));
                     listPlaces.add(new BusinessObject(busProp));
                 } catch (JSONException e) {

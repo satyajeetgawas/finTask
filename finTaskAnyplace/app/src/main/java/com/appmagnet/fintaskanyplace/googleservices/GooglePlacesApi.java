@@ -55,10 +55,10 @@ public class GooglePlacesApi {
         }
         java.util.Scanner s = new java.util.Scanner(stream).useDelimiter("\\A");
         String jsonResponse = s.hasNext() ? s.next() : "";
-        return getBusinessObjectsFromJson(jsonResponse);
+        return getBusinessObjectsFromJson(jsonResponse,term);
     }
 
-    private ArrayList<BusinessObject> getBusinessObjectsFromJson(String jsonResponse) {
+    private ArrayList<BusinessObject> getBusinessObjectsFromJson(String jsonResponse, String term) {
         ArrayList<BusinessObject> listPlaces = null;
         JSONObject json = null;
         JSONArray results = new JSONArray();
@@ -78,6 +78,7 @@ public class GooglePlacesApi {
                 busProp.put(BusinessObject.RATING, business.getString("rating"));
                 busProp.put(BusinessObject.LATITUDE, business.getJSONObject("geometry").getJSONObject("location").getString("lat"));
                 busProp.put(BusinessObject.LONGITUDE, business.getJSONObject("geometry").getJSONObject("location").getString("lng"));
+                busProp.put(BusinessObject.CATEGORY,term);
                 listPlaces.add(new BusinessObject(busProp));
             } catch (JSONException e) {
                 e.printStackTrace();

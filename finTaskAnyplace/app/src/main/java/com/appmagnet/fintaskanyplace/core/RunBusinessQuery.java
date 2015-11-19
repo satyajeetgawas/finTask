@@ -24,7 +24,9 @@ import com.appmagnet.fintaskanyplace.util.Constants;
 import com.appmagnet.fintaskanyplace.util.Util;
 import com.appmagnet.fintaskanyplace.yelp.YelpAPI;
 
+import java.sql.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -62,23 +64,22 @@ public class RunBusinessQuery extends AsyncTask<Context, Void, HashMap<String, A
                 location = lh.getLocationMap().get(LocationHandler.LATITUDE).toString();
                 location += ",";
                 location += lh.getLocationMap().get(LocationHandler.LONGITUDE).toString();
- //               location = "33.75,-84.39";
-                 /*
-            read the cached notes list and generate search terms, run the query  for individual
-            terms and identify which task can be completed based on the user settings like radius
-            and minimum rating
-             */
+                //               location = "33.75,-84.39";
+
+
                 NotesDBHelper mDbHelper = new NotesDBHelper(context);
                 SQLiteDatabase db = mDbHelper.getWritableDatabase();
                 Cursor c = db.rawQuery("SELECT DISTINCT category FROM Notes", null);
                 //String term = "grocery_or_supermarket"; //this term will be obtained from the saved(cached) file which is
                 //generated or refreshed once daily
 
-                if(c.moveToFirst()) {
+                if (c.moveToFirst()) {
                     do {
                         ArrayList<BusinessObject> listOfBusinesses = new ArrayList<BusinessObject>();
                         String term = c.getString(c.getColumnIndex(DBContract.NotesEntry.COLUMN_CATEGORY));
-                        //if(Constants.UNCATEGORIZED.equals(term)) {
+
+                        if (Constants.UNCATEGORIZED.equals(term))
+                            continue;
                         if (Boolean.parseBoolean(Util.getSettings(context, Constants.YELP_PREF))) {
                             YelpAPI yelpApi = new YelpAPI();
                             listOfBusinesses.addAll(yelpApi.searchForBusinessesByLocation(term, location));
@@ -88,28 +89,66 @@ public class RunBusinessQuery extends AsyncTask<Context, Void, HashMap<String, A
                             listOfBusinesses.addAll(googlePlaces.searchForBusinessesByLocation(term, location));
                         }
 
-                        for(int a=0;a<listOfBusinesses.size();a++){
-                            for(int b=a+1;b<listOfBusinesses.size();b++){
-                                    if(listOfBusinesses.get(a).getBusinessName().equalsIgnoreCase(listOfBusinesses.get(b).getBusinessName())){
-                                    Double longa = new Double(listOfBusinesses.get(a).getBusinessLongitude());
-                                    Double longb = new Double(listOfBusinesses.get(b).getBusinessLongitude());
-                                    Double lata = new Double(listOfBusinesses.get(a).getBusinessLatitude());
-                                    Double latb = new Double(listOfBusinesses.get(b).getBusinessLatitude());
-                                    if(  Math.abs(longa - longb) < 1 && Math.abs(lata - latb) < 1) {
-                                        listOfBusinesses.remove(b);
-                                        b--;
+                        if (listOfBusinesses.size() > 0) {
+                            filterBusiness(listOfBusinesses);
+                            categoryBusMap.put(term, listOfBusinesses);
+                        }
+
+                    } while (c.moveToNext());
+
+                }
+
+                c.close();
+                c = db.rawQuery("SELECT * FROM " + DBContract.NotesEntry.TABLE_NAME
+                        + " WHERE " + DBContract.NotesEntry.COLUMN_CATEGORY
+                        + " = '" + Constants.UNCATEGORIZED +"'", null);
+                ArrayList<BusinessObject> listOfBusinesses = new ArrayList<BusinessObject>();
+                if (c.moveToFirst()) {
+                    do {
+
+                        String ItemList = c.getString(c.getColumnIndex(DBContract.NotesEntry.COLUMN_CONTENT));
+                        if (ItemList.endsWith(",")) {
+                            int n = ItemList.lastIndexOf(",");
+                            ItemList = ItemList.substring(0, n);
+                        }
+                        ArrayList<String> uncategorizedItems = new ArrayList<String>(Arrays.asList(ItemList.split(",")));
+                        if (uncategorizedItems.size() > 0) {
+                            for (String s : uncategorizedItems) {
+                                if (s != null) {
+                                    if (Boolean.parseBoolean(Util.getSettings(context, Constants.YELP_PREF))) {
+                                        YelpAPI yelpApi = new YelpAPI();
+                                        listOfBusinesses.addAll(yelpApi.searchForBusinessesByLocation(s, location));
                                     }
                                 }
                             }
                         }
-
-                        if(listOfBusinesses.size() > 0)
-                            categoryBusMap.put(term, listOfBusinesses);
-                    }   while(c.moveToNext());
-                }
+                     } while (c.moveToNext());
+                    if (listOfBusinesses.size() > 0){
+                        filterBusiness(listOfBusinesses);
+                        categoryBusMap.put(Constants.UNCATEGORIZED, listOfBusinesses);
+                    }
                 }
             }
+        }
+
         return categoryBusMap;
+    }
+
+    private void filterBusiness(ArrayList<BusinessObject> listOfBusinesses) {
+        for (int a = 0; a < listOfBusinesses.size(); a++) {
+            for (int b = a + 1; b < listOfBusinesses.size(); b++) {
+                if (listOfBusinesses.get(a).getBusinessName().equalsIgnoreCase(listOfBusinesses.get(b).getBusinessName())) {
+                    Double longa = new Double(listOfBusinesses.get(a).getBusinessLongitude());
+                    Double longb = new Double(listOfBusinesses.get(b).getBusinessLongitude());
+                    Double lata = new Double(listOfBusinesses.get(a).getBusinessLatitude());
+                    Double latb = new Double(listOfBusinesses.get(b).getBusinessLatitude());
+                    if (Math.abs(longa - longb) < 1 && Math.abs(lata - latb) < 1) {
+                        listOfBusinesses.remove(b);
+                        b--;
+                    }
+                }
+            }
+        }
     }
 
     private void createNotification(HashMap mapOfBusinessPlaces) {

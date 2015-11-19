@@ -15,6 +15,7 @@ public class BusinessObject implements Parcelable {
     public static final String RATING = "RATING";
     public static final String LATITUDE = "lat";
     public static final String LONGITUDE = "lng";
+    public static final String CATEGORY = "cat";
 
    private Map<String,String> businessProperties;
 
@@ -31,6 +32,7 @@ public class BusinessObject implements Parcelable {
             prop.put(RATING,in.readString());
             prop.put(LATITUDE,in.readString());
             prop.put(LONGITUDE,in.readString());
+            prop.put(CATEGORY,in.readString());
             return new BusinessObject(prop);
         }
 
@@ -56,6 +58,10 @@ public class BusinessObject implements Parcelable {
         return businessProperties.get(LONGITUDE);
     }
 
+    public String getBusinessCategory(){
+        return businessProperties.get(CATEGORY);
+    }
+
     public Map<String,String> getBusinessProperties(){
         return businessProperties;
     }
@@ -72,6 +78,7 @@ public class BusinessObject implements Parcelable {
         parcel.writeString(getBusinessRating());
         parcel.writeString(getBusinessLatitude());
         parcel.writeString(getBusinessLongitude());
+        parcel.writeString(getBusinessCategory());
 
     }
 }

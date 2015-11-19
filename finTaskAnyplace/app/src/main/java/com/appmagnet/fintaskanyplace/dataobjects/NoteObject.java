@@ -38,4 +38,8 @@ public class NoteObject {
     public String getGuid() {
         return noteGuid;
     }
+
+    public String getContents() {
+        return noteContent;
+    }
 }
