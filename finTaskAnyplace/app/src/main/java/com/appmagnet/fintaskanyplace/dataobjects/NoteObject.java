@@ -42,4 +42,6 @@ public class NoteObject {
     public String getContents() {
         return noteContent;
     }
+
+    
 }

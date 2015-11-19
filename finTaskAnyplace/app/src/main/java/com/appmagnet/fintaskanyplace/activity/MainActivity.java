@@ -162,22 +162,11 @@ public class MainActivity extends AppCompatActivity {
     public void createUI() {
         // get the listview
         expListView = (ExpandableListView) findViewById(R.id.lvExp);
-
-        // preparing list data
-        //prepareListData()
-
-
         listAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild);
-
-        // setting list adapter
         expListView.setAdapter(listAdapter);
-        for(int i=0;i<expListView.getHeaderViewsCount();i++){
+        for(int i=0;i<listDataHeader.size();i++){
             expListView.expandGroup(i);
         }
-
-
-
-
     }
 
     public void showPostDBWrite() {

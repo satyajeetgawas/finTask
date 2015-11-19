@@ -2,11 +2,13 @@ package com.appmagnet.fintaskanyplace.evernote;
 
 import android.app.Activity;
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.appmagnet.fintaskanyplace.core.ContentClassifier;
 import com.appmagnet.fintaskanyplace.core.TitleClassifier;
 import com.appmagnet.fintaskanyplace.db.DBContract;
+import com.appmagnet.fintaskanyplace.db.DeleteEntriesDBHelper;
 import com.evernote.client.android.EvernoteSession;
 import com.evernote.client.android.asyncclient.EvernoteNoteStoreClient;
 import com.evernote.edam.error.EDAMNotFoundException;
@@ -86,6 +88,8 @@ public class ReadUserNotes {
             queryAndProcessNotesRawData();
             for (String guid : guidList) {
                 String note_title = (String) notesTitle.get(guid);
+                if(shouldSkipEntry(activity,guid,note_title))
+                    continue;
                 if (TitleClassifier.isTitleGrocery(note_title)) {
                    writeToDB(db,note_title,guid,"grocery_or_supermarket",(String)notesData.get(guid));
                 } else if (TitleClassifier.isNoteRequired(note_title)) {
@@ -117,6 +121,8 @@ public class ReadUserNotes {
         db.close();
     }
 
+
+
     private void writeToDB(SQLiteDatabase db, String note_title, String guid, String category, String mappedItems) {
         ContentValues values = new ContentValues();
         values.put(DBContract.NotesEntry.NOTE_ID,  guid);
@@ -129,5 +135,19 @@ public class ReadUserNotes {
                 null,
                 values);
     }
+    private boolean shouldSkipEntry(Activity activity, String guid, String note_title) {
+        boolean shouldSkip = false;
+        DeleteEntriesDBHelper dbHelper = new DeleteEntriesDBHelper(activity);
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT * FROM "+ DBContract.DeletedEntries.TABLE_NAME+" WHERE "+
+                DBContract.DeletedEntries.COLUMN_NOTE_ID + "= '" + guid + "' AND "+
+                DBContract.DeletedEntries.COLUMN_NOTE_NAME +" = '"+
+                note_title+"'", null);
 
+        if(c.getCount()>0)
+            shouldSkip = true;
+        c.close();
+        db.close();
+        return shouldSkip;
+    }
 }

@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.appmagnet.fintaskanyplace.R;
@@ -62,18 +63,10 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
         TextView txtListChild = (TextView) convertView
                 .findViewById(R.id.lblListItem);
-        if(childText.startsWith("Evernote")){
-            convertView.setBackgroundColor(0xFF6FB536);
-        }
-        Button deleteButton = (Button)convertView.findViewById(R.id.delete_button);
+
+        ImageButton deleteButton = (ImageButton)convertView.findViewById(R.id.delete_button);
         deleteButton.setFocusable(false);
-        deleteButton.setOnClickListener(new DeleteButtonLisener(this,_context,noteObj));
-
-
-        Button searchNearbyBtn = (Button)convertView.findViewById(R.id.search_nearby_btn);
-        searchNearbyBtn.setFocusable(false);
-        searchNearbyBtn.setOnClickListener(new SearchNearbyBtnListener(_context, noteObj));
-
+        deleteButton.setOnClickListener(new DeleteButtonLisener(this, _context, noteObj));
         txtListChild.setText(childText);
         return convertView;
     }
@@ -109,9 +102,8 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = infalInflater.inflate(R.layout.list_group, null);
         }
-        Button groupButton = (Button)convertView.findViewById(R.id.button);
-        groupButton.setFocusable(false);
-
+        ImageButton searchNearbyBtn = (ImageButton)convertView.findViewById(R.id.search_button);
+        searchNearbyBtn.setFocusable(false);
 
         TextView lblListHeader = (TextView) convertView
                 .findViewById(R.id.lblListHeader);
@@ -132,8 +124,14 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     }
 
     public void removeChild(NoteObject obj){
-        _listDataChild.get(obj.getNoteType()).remove(obj);
+        List noteList = _listDataChild.get(obj.getNoteType());
+        noteList.remove(obj);
+        if(noteList.size()==0){
+            _listDataChild.remove(obj.getNoteType());
+            _listDataHeader.remove(obj.getNoteType());
+        }else{
+            _listDataChild.put(obj.getNoteType(),noteList);
+        }
         ((MainActivity)_context).createUI();
-
     }
 }

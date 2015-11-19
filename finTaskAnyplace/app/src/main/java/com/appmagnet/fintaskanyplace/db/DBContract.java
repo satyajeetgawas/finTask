@@ -23,4 +23,11 @@ public final class DBContract {
         public static final String COLUMN_CATEGORY = "category";
         public static final String COLUMN_CONTENTS = "content";
     }
+
+    public static abstract class DeletedEntries implements BaseColumns {
+        public static final String TABLE_NAME = "Deleted_Entries";
+        public static final String COLUMN_NOTE_ID = "note_id";
+        public static final String COLUMN_NOTE_NAME = "note_name";
+    }
+
 }
