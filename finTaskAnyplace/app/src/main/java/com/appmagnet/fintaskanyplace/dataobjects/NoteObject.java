@@ -43,5 +43,8 @@ public class NoteObject {
         return noteContent;
     }
 
-    
+
+    public String getNoteTitle() {
+        return noteTitle;
+    }
 }
