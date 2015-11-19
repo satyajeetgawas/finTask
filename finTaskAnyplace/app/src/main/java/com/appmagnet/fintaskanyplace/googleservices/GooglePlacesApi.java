@@ -79,6 +79,7 @@ public class GooglePlacesApi {
                 busProp.put(BusinessObject.LATITUDE, business.getJSONObject("geometry").getJSONObject("location").getString("lat"));
                 busProp.put(BusinessObject.LONGITUDE, business.getJSONObject("geometry").getJSONObject("location").getString("lng"));
                 busProp.put(BusinessObject.CATEGORY,term);
+                //busProp.put(BusinessObject.ITEMS,items);
                 listPlaces.add(new BusinessObject(busProp));
             } catch (JSONException e) {
                 e.printStackTrace();

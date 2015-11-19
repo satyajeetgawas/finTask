@@ -17,5 +17,7 @@ public interface Constants {
     String REFRESH_RATE = "REFRESH_RATE";
     String LIST_OF_PLACES = "LIST_OF_PLACES" ;
     String UNCATEGORIZED = "Uncategorized";
+    String AFTER_NOTIFICATION_LIST = "AFTER_NOTIFICATION_LIST";
+    String CONTENTS_STRING = "CONTENTS_STRING";
     //public static long REFRESH_RATE = 30000;
 }

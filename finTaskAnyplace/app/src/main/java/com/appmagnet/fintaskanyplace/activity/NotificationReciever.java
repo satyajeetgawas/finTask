@@ -1,5 +1,6 @@
 package com.appmagnet.fintaskanyplace.activity;
 
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -98,7 +99,7 @@ public class NotificationReciever extends AppCompatActivity {
     }
 
     private void makeToast(String header, NoteObject noteObj) {
-        List<BusinessObject> businessesList = new ArrayList<>(mapOfBusiness.get(header));
+        ArrayList<BusinessObject> businessesList = new ArrayList<>(mapOfBusiness.get(header));
 
         if(Constants.UNCATEGORIZED.equals(header)){
             ArrayList addList = new ArrayList();
@@ -119,7 +120,12 @@ public class NotificationReciever extends AppCompatActivity {
             toast +="\n "+busObj.getBusinessName();
         }
 
-        Toast.makeText(getApplicationContext(),toast,Toast.LENGTH_LONG).show();
+        Intent intent = new Intent(getApplicationContext(), searchedResults.class);
+        intent.putExtra(Constants.AFTER_NOTIFICATION_LIST, businessesList);
+        intent.putExtra(Constants.CONTENTS_STRING, noteObj.getContents());
+        //PendingIntent pIntent = PendingIntent.getActivity(getApplicationContext(), (int) System.currentTimeMillis(), intent, 0);
+        startActivity(intent);
+        //Toast.makeText(getApplicationContext(),toast,Toast.LENGTH_LONG).show();
     }
 
     public void showPostDBWrite() {

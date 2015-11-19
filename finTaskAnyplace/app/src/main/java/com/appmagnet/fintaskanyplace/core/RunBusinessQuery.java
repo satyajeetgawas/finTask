@@ -77,6 +77,7 @@ public class RunBusinessQuery extends AsyncTask<Context, Void, HashMap<String, A
                     do {
                         ArrayList<BusinessObject> listOfBusinesses = new ArrayList<BusinessObject>();
                         String term = c.getString(c.getColumnIndex(DBContract.NotesEntry.COLUMN_CATEGORY));
+                        //String items = c.getString(c.getColumnIndex(DBContract.NotesEntry.COLUMN_CONTENT));
 
                         if (Constants.UNCATEGORIZED.equals(term))
                             continue;
@@ -117,7 +118,7 @@ public class RunBusinessQuery extends AsyncTask<Context, Void, HashMap<String, A
                                 if (s != null) {
                                     if (Boolean.parseBoolean(Util.getSettings(context, Constants.YELP_PREF))) {
                                         YelpAPI yelpApi = new YelpAPI();
-                                        listOfBusinesses.addAll(yelpApi.searchForBusinessesByLocation(s, location));
+                                        listOfBusinesses.addAll(yelpApi.searchForBusinessesByLocation(s,location));
                                     }
                                 }
                             }

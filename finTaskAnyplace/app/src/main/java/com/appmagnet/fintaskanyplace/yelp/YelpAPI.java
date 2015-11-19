@@ -88,6 +88,7 @@ public class YelpAPI {
                     busProp.put( BusinessObject.LATITUDE , business.getJSONObject("location").getJSONObject("coordinate").getString("latitude"));
                     busProp.put( BusinessObject.LONGITUDE, business.getJSONObject("location").getJSONObject("coordinate").getString("longitude"));
                     busProp.put(BusinessObject.CATEGORY,cat);
+                    //busProp.put(BusinessObject.ITEMS,items);
            //         business.getString("location.coordinate.longitude"));
                     listPlaces.add(new BusinessObject(busProp));
                 } catch (JSONException e) {
