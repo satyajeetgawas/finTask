@@ -19,5 +19,9 @@ public interface Constants {
     String UNCATEGORIZED = "Uncategorized";
     String AFTER_NOTIFICATION_LIST = "AFTER_NOTIFICATION_LIST";
     String CONTENTS_STRING = "CONTENTS_STRING";
+    String  GOOGLE_CALENDAR = "Google Calendar";
+    String GOOGLE_CALENDAR_CATEGORY = "Buy Birthdays Gifts";
+
+
     //public static long REFRESH_RATE = 30000;
 }

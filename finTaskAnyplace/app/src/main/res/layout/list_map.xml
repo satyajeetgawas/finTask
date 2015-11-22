@@ -5,25 +5,25 @@
     android:background="#ffffff">
 
     <TextView
-        android:id="@+id/lblListHeader"
+        android:id="@+id/business_text"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:textSize="20dp"
+        android:layout_height="60dp"
+        android:textSize="17dp"
         android:textColor="#000000"
         android:layout_marginTop="10dp"
         android:layout_gravity="center_vertical|left"
         android:layout_alignParentStart="false"
         android:gravity="center_vertical"
         android:layout_centerVertical="true"
-        android:layout_toLeftOf="@+id/search_button"
-        android:layout_toStartOf="@+id/search_button"
-        android:paddingLeft = "10dp" />
+        android:layout_toStartOf="@+id/open_in_maps"
+        android:paddingLeft = "10dp"
+        android:layout_toLeftOf="@+id/open_in_maps" />
 
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/search_button"
-        android:src="@drawable/search_button"
+        android:id="@+id/open_in_maps"
+        android:src="@drawable/maps"
         android:background="@android:color/transparent"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="10dp"

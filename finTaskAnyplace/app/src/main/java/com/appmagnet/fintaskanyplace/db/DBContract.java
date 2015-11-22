@@ -16,6 +16,7 @@ public final class DBContract {
         public static final String COLUMN_CONTENT = "content";
         public static final String COLUMN_CATEGORY = "category";
         public static final String COLUMN_NOTE_DATE = "note_date";
+        public static final String COLUMN_SOURCE = "source";
     }
 
     public static abstract class CategoryEntry implements BaseColumns {
@@ -28,6 +29,7 @@ public final class DBContract {
         public static final String TABLE_NAME = "Deleted_Entries";
         public static final String COLUMN_NOTE_ID = "note_id";
         public static final String COLUMN_NOTE_NAME = "note_name";
+        public static final String COLUMN_NOTE_CONTENT = "note_content";
     }
 
 }

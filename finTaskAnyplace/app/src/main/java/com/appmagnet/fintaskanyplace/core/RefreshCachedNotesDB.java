@@ -6,10 +6,12 @@ import android.os.AsyncTask;
 
 import com.appmagnet.fintaskanyplace.activity.MainActivity;
 import com.appmagnet.fintaskanyplace.db.NotesDBHelper;
-import com.appmagnet.fintaskanyplace.evernote.ReadUserNotes;
+import com.appmagnet.fintaskanyplace.notes.EvernoteReadUserNotes;
 import com.appmagnet.fintaskanyplace.googleservices.GoogleGalendarApiTask;
+import com.appmagnet.fintaskanyplace.notes.WunderlistReadUserNotes;
 import com.appmagnet.fintaskanyplace.util.Constants;
 import com.appmagnet.fintaskanyplace.util.Util;
+import com.appmagnet.fintaskanyplace.wunderlist.WunderlistSession;
 import com.evernote.client.android.EvernoteSession;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.util.ExponentialBackOff;
@@ -35,12 +37,23 @@ public class RefreshCachedNotesDB extends AsyncTask<Void,Void,Void> {
        try {
             if (EvernoteSession.getInstance()!=null && EvernoteSession.getInstance().isLoggedIn())
                 refreshEvernoteData();
+           if(WunderlistSession.getInstance()
+                   !=null && WunderlistSession.getInstance().isLoggedIn())
+               refreshWunderlistData();
             if (!"0".equals(Util.getSettings(activity, Constants.PREF_ACCOUNT_NAME)))
                 refreshCalendarData();
         }catch (Exception e){
-            cancel(true);
+           cancel(true);
         }
         return null;
+    }
+
+    private void refreshWunderlistData() throws Exception {
+        WunderlistReadUserNotes wunderlistNotes = new WunderlistReadUserNotes();
+        SQLiteDatabase db  = mDbHelper.getWritableDatabase();
+        wunderlistNotes.writeNotesToDB(db,activity);
+        db.close();
+
     }
 
     private void refreshCalendarData() throws IOException {
@@ -57,7 +70,7 @@ public class RefreshCachedNotesDB extends AsyncTask<Void,Void,Void> {
     }
 
     private void refreshEvernoteData() throws Exception {
-      ReadUserNotes userNotes = new ReadUserNotes();
+      EvernoteReadUserNotes userNotes = new EvernoteReadUserNotes();
         SQLiteDatabase db  = mDbHelper.getWritableDatabase();
         userNotes.writeNotesToDB(db,activity);
         db.close();

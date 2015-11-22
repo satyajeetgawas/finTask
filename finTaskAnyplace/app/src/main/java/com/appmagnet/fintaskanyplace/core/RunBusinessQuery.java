@@ -3,6 +3,7 @@ package com.appmagnet.fintaskanyplace.core;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -15,11 +16,13 @@ import android.widget.Toast;
 import com.appmagnet.fintaskanyplace.R;
 import com.appmagnet.fintaskanyplace.activity.MainActivity;
 import com.appmagnet.fintaskanyplace.activity.NotificationReciever;
+import com.appmagnet.fintaskanyplace.activity.SearchedResults;
 import com.appmagnet.fintaskanyplace.dataobjects.BusinessObject;
 import com.appmagnet.fintaskanyplace.db.DBContract;
 import com.appmagnet.fintaskanyplace.db.NotesDBHelper;
 import com.appmagnet.fintaskanyplace.googleservices.GooglePlacesApi;
 import com.appmagnet.fintaskanyplace.initializer.LocationHandler;
+import com.appmagnet.fintaskanyplace.ui.SearchNearbyBtnListener;
 import com.appmagnet.fintaskanyplace.util.Constants;
 import com.appmagnet.fintaskanyplace.util.Util;
 import com.appmagnet.fintaskanyplace.yelp.YelpAPI;
@@ -29,28 +32,52 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Created by satyajeet and anmol on 11/6/2015.
  */
-public class RunBusinessQuery extends AsyncTask<Context, Void, HashMap<String, ArrayList>> {
+public class RunBusinessQuery extends AsyncTask<Object, Void, HashMap<String, ArrayList>> {
     Context context;
+    String category;
+    boolean isForNotification = true;
+    boolean skipGoogle = false;
+    private SearchNearbyBtnListener listener;
+
 
     @Override
-    protected HashMap<String , ArrayList> doInBackground(Context[] params) {
-        context = params[0];
+    protected HashMap<String , ArrayList> doInBackground(Object[] params) {
+        context = (Context)params[0];
+        isForNotification = true;
+        if(params.length>1){
+            isForNotification = false;
+            category = (String)params[1];
+            skipGoogle = (boolean)params[2];
+            listener = (SearchNearbyBtnListener)params[3];
+        }
+
+
         return runTheSearchQuery();
     }
 
     @Override
-    protected void onPostExecute(HashMap<String, ArrayList> mapOfBusinesses) {
+    protected void onPostExecute(HashMap<String,ArrayList> mapOfBusinesses) {
          //for debuging later create a notification
 
-        if ( mapOfBusinesses.size()>0) {
-//           String businessesCon = TextUtils.join("\n", businessNames);
-//           Toast.makeText(context, businessesCon, Toast.LENGTH_LONG).show();
+        if ( mapOfBusinesses.size()>0 && isForNotification) {
             createNotification(mapOfBusinesses);
+        }else if(!isForNotification){
+            if(listener!=null)
+                listener.dismissProgress();
+            if(mapOfBusinesses.get(category)!=null && context !=null){
+                Intent intent = new Intent(context.getApplicationContext(), SearchedResults.class);
+                intent.putParcelableArrayListExtra(Constants.AFTER_NOTIFICATION_LIST, mapOfBusinesses.get(category));
+                intent.putExtra(Constants.CONTENTS_STRING, category);
+                context.startActivity(intent);
+            }
+
         }
+
     }
 
     private HashMap runTheSearchQuery() {
@@ -58,13 +85,33 @@ public class RunBusinessQuery extends AsyncTask<Context, Void, HashMap<String, A
         LocationHandler lh = LocationHandler.getInstance();
         HashMap categoryBusMap = new HashMap<String, ArrayList>();
 
+
+
         if (lh != null && lh.isLocationEnabled()) {
             if (lh.getLocationMap().get(LocationHandler.LATITUDE) != null) {
                 String location;
                 location = lh.getLocationMap().get(LocationHandler.LATITUDE).toString();
                 location += ",";
                 location += lh.getLocationMap().get(LocationHandler.LONGITUDE).toString();
-                //               location = "33.75,-84.39";
+
+
+                if(!isForNotification){
+                    ArrayList<BusinessObject> listOfBusinesses = new ArrayList<BusinessObject>();
+                    if (Boolean.parseBoolean(Util.getSettings(context, Constants.YELP_PREF))) {
+                        YelpAPI yelpApi = new YelpAPI();
+                        listOfBusinesses.addAll(yelpApi.searchForBusinessesByLocation(category, location));
+                    }
+                    if (Boolean.parseBoolean(Util.getSettings(context, Constants.GOOGLE_PLACES_PREF)) && !skipGoogle) {
+                        GooglePlacesApi googlePlaces = new GooglePlacesApi();
+                        listOfBusinesses.addAll(googlePlaces.searchForBusinessesByLocation(category, location));
+                    }
+
+                    if (listOfBusinesses.size() > 0) {
+                        filterBusiness(listOfBusinesses);
+                        categoryBusMap.put(category, listOfBusinesses);
+                    }
+                    return categoryBusMap;
+                }
 
 
                 NotesDBHelper mDbHelper = new NotesDBHelper(context);
@@ -102,7 +149,7 @@ public class RunBusinessQuery extends AsyncTask<Context, Void, HashMap<String, A
                 c.close();
                 c = db.rawQuery("SELECT * FROM " + DBContract.NotesEntry.TABLE_NAME
                         + " WHERE " + DBContract.NotesEntry.COLUMN_CATEGORY
-                        + " = '" + Constants.UNCATEGORIZED +"'", null);
+                        + " = '" + Constants.UNCATEGORIZED + "'", null);
                 ArrayList<BusinessObject> listOfBusinesses = new ArrayList<BusinessObject>();
                 if (c.moveToFirst()) {
                     do {
@@ -118,13 +165,13 @@ public class RunBusinessQuery extends AsyncTask<Context, Void, HashMap<String, A
                                 if (s != null) {
                                     if (Boolean.parseBoolean(Util.getSettings(context, Constants.YELP_PREF))) {
                                         YelpAPI yelpApi = new YelpAPI();
-                                        listOfBusinesses.addAll(yelpApi.searchForBusinessesByLocation(s,location));
+                                        listOfBusinesses.addAll(yelpApi.searchForBusinessesByLocation(s, location));
                                     }
                                 }
                             }
                         }
-                     } while (c.moveToNext());
-                    if (listOfBusinesses.size() > 0){
+                    } while (c.moveToNext());
+                    if (listOfBusinesses.size() > 0) {
                         filterBusiness(listOfBusinesses);
                         categoryBusMap.put(Constants.UNCATEGORIZED, listOfBusinesses);
                     }

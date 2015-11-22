@@ -14,6 +14,7 @@ public class DeleteEntriesDBHelper extends SQLiteOpenHelper {
     private static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE " + DBContract.DeletedEntries.TABLE_NAME + " (" +
                     DBContract.DeletedEntries.COLUMN_NOTE_ID + TEXT_TYPE + COMMA_SEP +
+                    DBContract.DeletedEntries.COLUMN_NOTE_CONTENT + TEXT_TYPE + COMMA_SEP +
                     DBContract.DeletedEntries.COLUMN_NOTE_NAME + TEXT_TYPE +
 
                     " )";
@@ -22,7 +23,7 @@ public class DeleteEntriesDBHelper extends SQLiteOpenHelper {
             "DROP TABLE IF EXISTS " + DBContract.NotesEntry.TABLE_NAME;
 
     public static final int DATABASE_VERSION = 1;
-    public static final String DATABASE_NAME = "Notes.db";
+    public static final String DATABASE_NAME = DBContract.DeletedEntries.TABLE_NAME+".db";
 
     public DeleteEntriesDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);

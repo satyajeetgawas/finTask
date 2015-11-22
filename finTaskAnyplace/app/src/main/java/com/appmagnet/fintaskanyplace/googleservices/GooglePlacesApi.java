@@ -53,8 +53,15 @@ public class GooglePlacesApi {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        java.util.Scanner s = new java.util.Scanner(stream).useDelimiter("\\A");
-        String jsonResponse = s.hasNext() ? s.next() : "";
+        String jsonResponse = "";
+        try {
+            java.util.Scanner s = new java.util.Scanner(stream).useDelimiter("\\A");
+           if(s.hasNext() )
+               jsonResponse = s.next();
+        }catch (NullPointerException e){
+
+        }
+
         return getBusinessObjectsFromJson(jsonResponse,term);
     }
 

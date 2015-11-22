@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="grocery_or_supermarket">#EF5350</color>
+    <color name="hardware_store" >#42A5F5</color>
+    <color name="clothing_store">#26A69A</color>
+    <color name="uncategorized">#FFEE58</color>
+    <color name="primary_material_dark">#039be5</color>
+    <color name="background_material_light">#ffffff</color>
+    <color name="black">#039be5</color>
+    <color name="statusBarColor">#039be5</color>
+    <color name="accent_material_light">#039be5</color>
+    <color name="theme_color">#039be5</color>
+    <color name="google_calendar" >#0ad103</color>
+
+</resources>

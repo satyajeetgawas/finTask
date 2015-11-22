@@ -1,14 +1,13 @@
-package com.appmagnet.fintaskanyplace.evernote;
+package com.appmagnet.fintaskanyplace.notes;
 
 import android.app.Activity;
 import android.content.ContentValues;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.appmagnet.fintaskanyplace.core.ContentClassifier;
 import com.appmagnet.fintaskanyplace.core.TitleClassifier;
 import com.appmagnet.fintaskanyplace.db.DBContract;
-import com.appmagnet.fintaskanyplace.db.DeleteEntriesDBHelper;
+import com.appmagnet.fintaskanyplace.util.Util;
 import com.evernote.client.android.EvernoteSession;
 import com.evernote.client.android.asyncclient.EvernoteNoteStoreClient;
 import com.evernote.edam.error.EDAMNotFoundException;
@@ -19,6 +18,7 @@ import com.evernote.edam.notestore.NoteList;
 import com.evernote.edam.type.Note;
 import com.evernote.thrift.TException;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,11 +27,11 @@ import java.util.Map;
 /**
  * Created by satyajeet and anmol on 10/21/2015.
  */
-public class ReadUserNotes {
+public class EvernoteReadUserNotes {
 
     private List<String> guidList;
     private Map notesData;
-    private Map notesTitle;
+    private Map notes;
     private EvernoteNoteStoreClient noteStoreClient;
     final static String NOTE_START = "<en-note>";
     final static String NOTE_CLOSE = "</en-note>";
@@ -41,9 +41,9 @@ public class ReadUserNotes {
     final static String DIV_END = "</div>";
     final static String NEW_LINE = "<div><br clear=\"none\"/></div>";
 
-    public ReadUserNotes() {
+    public EvernoteReadUserNotes() {
         guidList = new ArrayList();
-        notesTitle = new HashMap();
+        notes = new HashMap();
         notesData = new HashMap();
         noteStoreClient = EvernoteSession.getInstance().getEvernoteClientFactory().getNoteStoreClient();
 
@@ -58,7 +58,7 @@ public class ReadUserNotes {
 
             for (Note note : listOfNotes) {
                 guidList.add(note.getGuid());
-                notesTitle.put(note.getGuid(), note.getTitle());
+                notes.put(note.getGuid(), note);
 
             }
         }
@@ -87,11 +87,17 @@ public class ReadUserNotes {
             queryNotesGuid();
             queryAndProcessNotesRawData();
             for (String guid : guidList) {
-                String note_title = (String) notesTitle.get(guid);
-                if(shouldSkipEntry(activity,guid,note_title))
-                    continue;
+                String note_title =  ((Note)notes.get(guid)).getTitle();
+
                 if (TitleClassifier.isTitleGrocery(note_title)) {
-                   writeToDB(db,note_title,guid,"grocery_or_supermarket",(String)notesData.get(guid));
+                    if(Util.shouldSkipEntry(activity,guid,note_title,(String)notesData.get(guid)))
+                        continue;
+                    String contents = (String)notesData.get(guid);
+                    if(contents.endsWith(","))
+                        contents = contents.substring(0,contents.length()-1);
+                    contents = contents.replace(",",", ");
+                   writeToDB(db,note_title,guid,"grocery_or_supermarket",contents);
+
                 } else if (TitleClassifier.isNoteRequired(note_title)) {
                     String content = (String) notesData.get(guid);
                     String[] items = content.split(",");
@@ -109,6 +115,10 @@ public class ReadUserNotes {
                     for (Map.Entry<String, String> entry : itemMap.entrySet()) {
                         String category = entry.getKey();
                         String mappedItems = entry.getValue();
+                        if(mappedItems.endsWith(","))
+                            mappedItems = mappedItems.substring(0,mappedItems.length()-1);
+                        if(Util.shouldSkipEntry(activity, guid, note_title, mappedItems))
+                            continue;
                         writeToDB(db, note_title, guid, category, mappedItems);
                     }
                 }
@@ -126,8 +136,11 @@ public class ReadUserNotes {
     private void writeToDB(SQLiteDatabase db, String note_title, String guid, String category, String mappedItems) {
         ContentValues values = new ContentValues();
         values.put(DBContract.NotesEntry.NOTE_ID,  guid);
-        values.put(DBContract.NotesEntry.COLUMN_NAME_TITLE, "Evernote: " + note_title);
-        values.put(DBContract.NotesEntry.COLUMN_NOTE_DATE, (String) notesTitle.get(guid));
+        values.put(DBContract.NotesEntry.COLUMN_SOURCE,"Evernote");
+        values.put(DBContract.NotesEntry.COLUMN_NAME_TITLE, note_title);
+        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
+        String formattedDate = df.format(((Note) notes.get(guid)).getCreated());
+        values.put(DBContract.NotesEntry.COLUMN_NOTE_DATE, formattedDate);
         values.put(DBContract.NotesEntry.COLUMN_CATEGORY, category);
         values.put(DBContract.NotesEntry.COLUMN_CONTENT, mappedItems);
         db.insert(
@@ -135,19 +148,5 @@ public class ReadUserNotes {
                 null,
                 values);
     }
-    private boolean shouldSkipEntry(Activity activity, String guid, String note_title) {
-        boolean shouldSkip = false;
-        DeleteEntriesDBHelper dbHelper = new DeleteEntriesDBHelper(activity);
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT * FROM "+ DBContract.DeletedEntries.TABLE_NAME+" WHERE "+
-                DBContract.DeletedEntries.COLUMN_NOTE_ID + "= '" + guid + "' AND "+
-                DBContract.DeletedEntries.COLUMN_NOTE_NAME +" = '"+
-                note_title+"'", null);
 
-        if(c.getCount()>0)
-            shouldSkip = true;
-        c.close();
-        db.close();
-        return shouldSkip;
-    }
 }

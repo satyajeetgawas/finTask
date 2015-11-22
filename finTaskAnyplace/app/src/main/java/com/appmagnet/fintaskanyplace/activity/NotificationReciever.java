@@ -1,21 +1,13 @@
 package com.appmagnet.fintaskanyplace.activity;
 
-import android.app.PendingIntent;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
-import android.text.method.ScrollingMovementMethod;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ExpandableListView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.appmagnet.fintaskanyplace.R;
 import com.appmagnet.fintaskanyplace.dataobjects.BusinessObject;
@@ -28,8 +20,6 @@ import com.appmagnet.fintaskanyplace.util.Constants;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 /**
  * Created by satyajeet and anmol on 11/10/15.
@@ -78,22 +68,22 @@ public class NotificationReciever extends AppCompatActivity {
     public void createUI() {
         // get the listview
         expListView = (ExpandableListView) findViewById(R.id.lvExp);
-        listAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild);
+        listAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild,mapOfBusiness);
 
         // setting list adapter
         expListView.setAdapter(listAdapter);
         for(int i=0;i<expListView.getHeaderViewsCount();i++){
             expListView.expandGroup(i);
         }
-        expListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-            @Override
-            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-                String header = (String) parent.getExpandableListAdapter().getGroup(groupPosition);
-                NoteObject noteObj = (NoteObject)parent.getExpandableListAdapter().getChild(groupPosition,childPosition);
-                makeToast(header,noteObj);
-                return true;
-            }
-        });
+//        expListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+//            @Override
+//            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+//                String header = (String) parent.getExpandableListAdapter().getGroup(groupPosition);
+//                NoteObject noteObj = (NoteObject)parent.getExpandableListAdapter().getChild(groupPosition,childPosition);
+//                makeToast(header,noteObj);
+//                return false;
+//            }
+//        });
 
 
     }
@@ -120,7 +110,7 @@ public class NotificationReciever extends AppCompatActivity {
             toast +="\n "+busObj.getBusinessName();
         }
 
-        Intent intent = new Intent(getApplicationContext(), searchedResults.class);
+        Intent intent = new Intent(getApplicationContext(), SearchedResults.class);
         intent.putExtra(Constants.AFTER_NOTIFICATION_LIST, businessesList);
         intent.putExtra(Constants.CONTENTS_STRING, noteObj.getContents());
         //PendingIntent pIntent = PendingIntent.getActivity(getApplicationContext(), (int) System.currentTimeMillis(), intent, 0);

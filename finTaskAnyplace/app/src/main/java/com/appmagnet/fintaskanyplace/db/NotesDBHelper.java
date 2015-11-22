@@ -18,6 +18,7 @@ public class NotesDBHelper extends SQLiteOpenHelper {
                     DBContract.NotesEntry.COLUMN_NAME_TITLE + TEXT_TYPE + COMMA_SEP +
                     DBContract.NotesEntry.COLUMN_CONTENT + TEXT_TYPE + COMMA_SEP +
                     DBContract.NotesEntry.COLUMN_CATEGORY + TEXT_TYPE + COMMA_SEP +
+                    DBContract.NotesEntry.COLUMN_SOURCE + TEXT_TYPE + COMMA_SEP +
                     DBContract.NotesEntry.COLUMN_NOTE_DATE + TEXT_TYPE +
 
     " )";

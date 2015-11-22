@@ -1,6 +1,7 @@
 package com.appmagnet.fintaskanyplace.activity;
 
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -27,7 +28,14 @@ import com.appmagnet.fintaskanyplace.initializer.LocationHandler;
 import com.appmagnet.fintaskanyplace.ui.ExpandableListAdapter;
 import com.appmagnet.fintaskanyplace.util.Constants;
 import com.appmagnet.fintaskanyplace.util.Util;
+import com.appmagnet.fintaskanyplace.wunderlist.WunderlistSession;
+import com.appmagnet.fintaskanyplace.wunderlist.WunderlistUser;
 import com.evernote.client.android.EvernoteSession;
+import com.evernote.edam.error.EDAMNotFoundException;
+import com.evernote.edam.error.EDAMSystemException;
+import com.evernote.edam.error.EDAMUserException;
+import com.evernote.edam.notestore.NoteFilter;
+import com.evernote.thrift.TException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,13 +47,12 @@ import java.util.Objects;
  */
 public class MainActivity extends AppCompatActivity {
 
-    private boolean isNotificationCall;
+
     private LocationHandler locHandle;
-    ExpandableListAdapter listAdapter;
-    ExpandableListView expListView;
-    List<String> listDataHeader;
-    HashMap<String, List<NoteObject>> listDataChild;
-    private static boolean showDialog = true;
+    private ExpandableListAdapter listAdapter;
+    private ExpandableListView expListView;
+    private ProgressDialog progress;
+    private int noOfItems;
 
     public BackgroundTaskReceiver backgroundTaskReceiver;
     @Override
@@ -56,15 +63,6 @@ public class MainActivity extends AppCompatActivity {
         backgroundTaskReceiver = new BackgroundTaskReceiver();
         Context context = this.getApplicationContext();
         backgroundTaskReceiver.doInBackground(context);
-
-
-
-
-
-        //String loc = "Latitude " + locHandle.getLocationMap().get(LocationHandler.LATITUDE) + " Longitude " +
-        //        locHandle.getLocationMap().get(LocationHandler.LONGITUDE);
-        //Toast.makeText(getApplicationContext(), loc, Toast.LENGTH_LONG).show();
-
     }
 
     @Override
@@ -72,8 +70,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         checkAndInitializePrerequisites();
         showPostDBWrite();
-        RefreshCachedNotesDB dbTask = new RefreshCachedNotesDB(this);
-        dbTask.execute();
+
     }
 
     @Override
@@ -86,10 +83,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
         int id = item.getItemId();
-
         if(id==R.id.action_settings){
             startSettingsActivity();
             return true;
+        }
+        if(id==R.id.action_refresh){
+            progress = ProgressDialog.show(this, getString(R.string.loading_title),
+                    getString(R.string.loading_content), true);
+            RefreshCachedNotesDB dbTask = new RefreshCachedNotesDB(this);
+            dbTask.execute();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -99,7 +101,8 @@ public class MainActivity extends AppCompatActivity {
         locHandle= new LocationHandler(this);
         boolean is = EvernoteSession.getInstance()==null || !EvernoteSession.getInstance().isLoggedIn();
         if ((EvernoteSession.getInstance()==null || !EvernoteSession.getInstance().isLoggedIn()) &&
-                "0".equals(Util.getSettings(this, Constants.PREF_ACCOUNT_NAME)))
+                "0".equals(Util.getSettings(this, Constants.PREF_ACCOUNT_NAME))
+                && (WunderlistSession.getInstance()==null || !WunderlistSession.getInstance().isLoggedIn()))
         {
            showEnableAtleastOneAccount();
         }
@@ -107,17 +110,10 @@ public class MainActivity extends AppCompatActivity {
         else if (!locHandle.isLocationEnabled()) {
            showLocationEnableDialog();
         }
-        else
-            showTaskList();
-
     }
 
 
-    private void showTaskList() {
 
-
-
-    }
 
     private void showEnableAtleastOneAccount() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -125,7 +121,6 @@ public class MainActivity extends AppCompatActivity {
         builder.setMessage("Please enable atleast one Service");
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialogInterface, int i) {
-                // Show location settings when the user acknowledges the alert dialog
                 startSettingsActivity();
             }
         });
@@ -136,13 +131,11 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void showLocationEnableDialog(){
-        // Build the alert dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Location Services Not Active");
         builder.setMessage("Please enable Location Services and GPS");
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialogInterface, int i) {
-                // Show location settings when the user acknowledges the alert dialog
                 Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                 startActivity(intent);
             }
@@ -160,17 +153,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void createUI() {
-        // get the listview
+
         expListView = (ExpandableListView) findViewById(R.id.lvExp);
-        listAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild);
+        listAdapter = new ExpandableListAdapter(this, Util.listDataHeader, Util.listDataChild);
         expListView.setAdapter(listAdapter);
-        for(int i=0;i<listDataHeader.size();i++){
+        for(int i=0;i<Util.listDataHeader.size();i++){
             expListView.expandGroup(i);
         }
     }
 
     public void showPostDBWrite() {
 
+        if(progress!=null){
+            progress.dismiss();
+        }
         NotesDBHelper mDbHelper = new NotesDBHelper(getApplicationContext());
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
         Cursor c = db.query(
@@ -183,31 +179,28 @@ public class MainActivity extends AppCompatActivity {
                 null                                 // The sort order
         );
 
-        listDataHeader = new ArrayList<String>();
-        listDataChild = new HashMap<String, List<NoteObject>>();
-
-
+        Util.listDataHeader = new ArrayList<String>();
+        Util.listDataChild = new HashMap<String, List<NoteObject>>();
+        noOfItems = c.getCount();
         if (c.moveToFirst()) {
             do {
                 NoteObject obj = new NoteObject(c);
 
-                    if (listDataChild.get(obj.getNoteType()) == null) {
-                        ArrayList listOfNoteObj = new ArrayList();
-                        listOfNoteObj.add(obj);
-                        listDataHeader.add(obj.getNoteType());
-                        listDataChild.put(obj.getNoteType(), listOfNoteObj);
-                    } else {
-                        ArrayList list = (ArrayList) listDataChild.get(obj.getNoteType());
-                        list.add(obj);
-                        listDataChild.put(obj.getNoteType(), list);
-                    }
+                if (Util.listDataChild.get(obj.getNoteType()) == null) {
+                    ArrayList listOfNoteObj = new ArrayList();
+                    listOfNoteObj.add(obj);
+                    Util.listDataHeader.add(obj.getNoteType());
+                    Util.listDataChild.put(obj.getNoteType(), listOfNoteObj);
+                } else {
+                    ArrayList list = (ArrayList) Util.listDataChild.get(obj.getNoteType());
+                    list.add(obj);
+                    Util.listDataChild.put(obj.getNoteType(), list);
+                }
             }
             while (c.moveToNext());
         }
         if (c != null && !c.isClosed())
             c.close();
-
         createUI();
-
     }
 }

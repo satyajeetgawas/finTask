@@ -17,4 +17,7 @@ public class ApiKeys {
     public static final String GOOGLE_API_KEY = "AIzaSyDDiZo4REzRqwBmVngbINKYL4fLRIj1pz4";
     public static final String EVERNOTE_CONSUMER_KEY = "satya-5228";
     public static final String EVERNOTE_CONSUMER_SECRET = "bfd65c66026815fb";
+    public static final String CLIENT_ID = "29af49a0f2a719de533d";
+    public static final String CLIENT_SECRET = "4a405404731e6cf4ee5c0504eaf96173a148e1220dd3a4046edf78dae414";
+    public static final String REDIRECT_URI = "http://fintaskanyplace.com";
 }

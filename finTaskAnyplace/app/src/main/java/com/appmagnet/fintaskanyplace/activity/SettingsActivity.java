@@ -1,11 +1,14 @@
 package com.appmagnet.fintaskanyplace.activity;
 
 import android.accounts.AccountManager;
-import android.app.Activity;
+import android.annotation.TargetApi;
+import android.app.AlarmManager;
 import android.app.Dialog;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -15,8 +18,11 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.appmagnet.fintaskanyplace.R;
+import com.appmagnet.fintaskanyplace.backgroundtasks.BackgroundTaskReceiver;
 import com.appmagnet.fintaskanyplace.util.Constants;
 import com.appmagnet.fintaskanyplace.util.Util;
+import com.appmagnet.fintaskanyplace.wunderlist.WunderlistLoginResultCallback;
+import com.appmagnet.fintaskanyplace.wunderlist.WunderlistSession;
 import com.evernote.client.android.EvernoteSession;
 import com.evernote.client.android.login.EvernoteLoginFragment;
 import com.google.android.gms.common.ConnectionResult;
@@ -29,7 +35,7 @@ import java.util.Arrays;
 /**
  * Created by satyajeet and anmol on 10/21/2015.
  */
-public class SettingsActivity extends AppCompatActivity implements EvernoteLoginFragment.ResultCallback {
+public class SettingsActivity extends AppCompatActivity implements EvernoteLoginFragment.ResultCallback,WunderlistLoginResultCallback {
 
     GoogleAccountCredential mCredential;
     static final int REQUEST_ACCOUNT_PICKER = 1000;
@@ -38,14 +44,15 @@ public class SettingsActivity extends AppCompatActivity implements EvernoteLogin
     int radius, refresh_rate;
     private Switch googleCalendarSwitch;
     private Switch evernoteSwitch;
-
+    private Switch wunderlistSwitch;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
-        evernoteSwitch  = (Switch) findViewById(R.id.switch_evernote);
+
+        evernoteSwitch = (Switch) findViewById(R.id.switch_evernote);
         evernoteSwitch.setChecked(false);
         evernoteSwitch.setChecked(EvernoteSession.getInstance() != null && EvernoteSession.getInstance().isLoggedIn());
         evernoteSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -55,19 +62,30 @@ public class SettingsActivity extends AppCompatActivity implements EvernoteLogin
             }
         });
 
+        wunderlistSwitch = (Switch)findViewById(R.id.switch_wunderlist);
+        wunderlistSwitch.setChecked(WunderlistSession.getInstance() != null && WunderlistSession.getInstance().isLoggedIn());
+        wunderlistSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                wunderlistLogin(isChecked);
+            }
+        });
+
     }
+
+
 
     @Override
     protected void onResume() {
         super.onResume();
-       resetSettings();
+        resetSettings();
     }
 
-    private void resetSettings(){
+    private void resetSettings() {
         TextView radius_text1 = (TextView) findViewById(R.id.radiusCurrentValueID);
         String a = Util.getSettings(this, Constants.PROXIMITY_RADIUS);
-        if(a == "") {
-            a = "0";
+        if (a == "") {
+            a = "5";
         }
         radius_text1.setText(a + " miles");
         SeekBar seek_rad = (SeekBar) findViewById(R.id.RadiusSeekBarID);
@@ -75,10 +93,10 @@ public class SettingsActivity extends AppCompatActivity implements EvernoteLogin
 
         TextView refresh_text1 = (TextView) findViewById(R.id.refreshCurrentValueID);
         String b = Util.getSettings(this, Constants.REFRESH_RATE);
-        if(b == "") {
-            b = "0";
+        if (b == "") {
+            b = "4";
         }
-        refresh_text1.setText(b + " min");
+        refresh_text1.setText(b + " hours");
         SeekBar seek_ref = (SeekBar) findViewById(R.id.refreshSeekBarID);
         seek_ref.setProgress(new Integer(b));
 
@@ -93,10 +111,10 @@ public class SettingsActivity extends AppCompatActivity implements EvernoteLogin
         });
 
         Switch yelpApiSwitch = (Switch) findViewById(R.id.switch_yelp);
-        if("0".equals(Util.getSettings(this, Constants.YELP_PREF))){
+        if ("0".equals(Util.getSettings(this, Constants.YELP_PREF))) {
             yelpApiSwitch.setChecked(true);
             setSetting(Constants.YELP_PREF, String.valueOf(true));
-        }else
+        } else
             yelpApiSwitch.setChecked(Boolean.parseBoolean(Util.getSettings(this, Constants.YELP_PREF)));
         yelpApiSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -106,10 +124,10 @@ public class SettingsActivity extends AppCompatActivity implements EvernoteLogin
         });
 
         Switch googlePlacesSwitch = (Switch) findViewById(R.id.switch_google_places);
-        if("0".equals(Util.getSettings(this, Constants.GOOGLE_PLACES_PREF))){
+        if ("0".equals(Util.getSettings(this, Constants.GOOGLE_PLACES_PREF))) {
             googlePlacesSwitch.setChecked(true);
             setSetting(Constants.GOOGLE_PLACES_PREF, String.valueOf(true));
-        }else
+        } else
             googlePlacesSwitch.setChecked(Boolean.parseBoolean(Util.getSettings(this, Constants.GOOGLE_PLACES_PREF)));
         googlePlacesSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -144,13 +162,20 @@ public class SettingsActivity extends AppCompatActivity implements EvernoteLogin
         final SeekBar seek2 = (SeekBar) findViewById(R.id.refreshSeekBarID);
         seek2.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 
+            @TargetApi(Build.VERSION_CODES.LOLLIPOP)
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 // TODO Auto-generated method stub
                 refresh_rate = progress;
                 setSetting(Constants.REFRESH_RATE, String.valueOf(refresh_rate));
+
+                AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
+                Intent intent = new Intent(getBaseContext(), BackgroundTaskReceiver.class);
+                PendingIntent pi = PendingIntent.getBroadcast(getBaseContext(), 0, intent, 0);
+                am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), Util.getRefreshRate(getBaseContext()), pi);
                 TextView refresh_text = (TextView) findViewById(R.id.refreshCurrentValueID);
-                refresh_text.setText(String.valueOf(refresh_rate) + " min");
+                refresh_text.setText(String.valueOf(refresh_rate) + " hours");
             }
 
             @Override
@@ -166,39 +191,42 @@ public class SettingsActivity extends AppCompatActivity implements EvernoteLogin
     }
 
     private void googleCalendarLogin(boolean isChecked) {
-        if(isChecked) {
+        if (isChecked) {
             SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
             mCredential = GoogleAccountCredential.usingOAuth2(
                     getApplicationContext(), Arrays.asList(Constants.SCOPES))
                     .setBackOff(new ExponentialBackOff())
                     .setSelectedAccountName(settings.getString(Constants.PREF_ACCOUNT_NAME, null));
             if (mCredential.getSelectedAccountName() == null) {
-               chooseAccount();
+                chooseAccount();
             }
-        }else{
-           Util.setUserSetting(this,Constants.PREF_ACCOUNT_NAME,null);
+        } else {
+            Util.setUserSetting(this, Constants.PREF_ACCOUNT_NAME, null);
         }
 
     }
 
     private void evernoteLogin(boolean isChecked) {
-        if(isChecked)
+        if (isChecked)
             EvernoteSession.getInstance().authenticate(SettingsActivity.this);
         else
             EvernoteSession.getInstance().logOut();
     }
 
+    private void wunderlistLogin(boolean isChecked) {
+        if(isChecked){
+            WunderlistSession.getInstance().login(this);
+        }else
+            WunderlistSession.getInstance().logout();
+    }
 
-
-
-    private void setSetting(String key,String value) {
+    private void setSetting(String key, String value) {
         Util.setUserSetting(this, key, value);
     }
 
 
-
     @Override
-    public boolean onCreateOptionsMenu(Menu menu){
+    public boolean onCreateOptionsMenu(Menu menu) {
         return true;
     }
 
@@ -208,7 +236,7 @@ public class SettingsActivity extends AppCompatActivity implements EvernoteLogin
             int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        switch(requestCode) {
+        switch (requestCode) {
             case REQUEST_GOOGLE_PLAY_SERVICES:
                 if (resultCode != RESULT_OK) {
                     isGooglePlayServicesAvailable();
@@ -222,11 +250,10 @@ public class SettingsActivity extends AppCompatActivity implements EvernoteLogin
                     if (accountName != null) {
                         mCredential.setSelectedAccountName(accountName);
                         Util.setUserSetting(this, Constants.PREF_ACCOUNT_NAME, accountName);
-                    }
-                    else{
+                    } else {
                         googleCalendarSwitch.setChecked(false);
                     }
-                }else
+                } else
                     googleCalendarSwitch.setChecked(false);
                 break;
             case REQUEST_AUTHORIZATION:
@@ -236,14 +263,13 @@ public class SettingsActivity extends AppCompatActivity implements EvernoteLogin
                 break;
 
 
-
         }
 
         super.onActivityResult(requestCode, resultCode, data);
     }
 
     private void chooseAccount() {
-       startActivityForResult(
+        startActivityForResult(
                 mCredential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
     }
 
@@ -253,7 +279,7 @@ public class SettingsActivity extends AppCompatActivity implements EvernoteLogin
         if (GooglePlayServicesUtil.isUserRecoverableError(connectionStatusCode)) {
             showGooglePlayServicesAvailabilityErrorDialog(connectionStatusCode);
             return false;
-        } else if (connectionStatusCode != ConnectionResult.SUCCESS ) {
+        } else if (connectionStatusCode != ConnectionResult.SUCCESS) {
             return false;
         }
         return true;
@@ -271,9 +297,17 @@ public class SettingsActivity extends AppCompatActivity implements EvernoteLogin
 
     @Override
     public void onLoginFinished(boolean successful) {
-        if(successful)
+        if (successful)
             evernoteSwitch.setChecked(true);
         else
             evernoteSwitch.setChecked(false);
+    }
+
+    @Override
+    public void loginResult(boolean result) {
+        if(result)
+            wunderlistSwitch.setChecked(true);
+        else
+            wunderlistSwitch.setChecked(false);
     }
 }

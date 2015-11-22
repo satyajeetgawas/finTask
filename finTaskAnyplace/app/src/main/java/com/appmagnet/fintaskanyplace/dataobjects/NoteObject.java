@@ -14,18 +14,20 @@ public class NoteObject {
     private String noteDate;
     private String noteContent;
     private String noteGuid;
+    private String source;
 
     public NoteObject(Cursor c) {
         noteTitle = c.getString(c.getColumnIndex(DBContract.NotesEntry.COLUMN_NAME_TITLE));
         noteType = c.getString(c.getColumnIndex(DBContract.NotesEntry.COLUMN_CATEGORY ));
-        noteDate = "Nov 13, 2015";
+        noteDate = c.getString(c.getColumnIndex(DBContract.NotesEntry.COLUMN_NOTE_DATE));
         noteContent = c.getString(c.getColumnIndex(DBContract.NotesEntry.COLUMN_CONTENT));
         noteGuid = c.getString(c.getColumnIndex(DBContract.NotesEntry.NOTE_ID));
+        source = c.getString(c.getColumnIndex(DBContract.NotesEntry.COLUMN_SOURCE));
 
     }
 
     public String getFormattedString() {
-        String temp = noteTitle + "\n" + noteDate + "\n" + noteContent;
+        String temp = "<html><b>"+source+" : "+noteTitle + "</b><br>" + noteDate + "<br>" + noteContent+"</html>";
         return temp;
     }
 

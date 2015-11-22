@@ -16,11 +16,10 @@
             android:textSize="@dimen/heading_text_size"
          android:textStyle="bold" />
 
-
-        <View
-            android:layout_width="fill_parent"
-            android:layout_height="2dp"
-            android:background="#c0c0c0" />
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="2dp"
+        android:background="#c0c0c0" />
 
         <Switch
             android:id="@+id/switch_evernote"
@@ -29,17 +28,36 @@
             android:layout_gravity="center_horizontal"
             android:checked="false"
             android:text="@string/evernote"
-            android:textSize="@dimen/switch_text_size" />
+            android:textSize="@dimen/switch_text_size"
+            />
 
-        <Switch
-            android:id="@+id/switch_google_calendar"
-            android:layout_width="fill_parent"
-            android:layout_height="@dimen/layout_height"
-            android:checked="false"
-            android:text="@string/google_calendar"
-            android:textSize="@dimen/switch_text_size" />
 
-        <TextView
+
+
+
+
+
+    <Switch
+        android:id="@+id/switch_google_calendar"
+        android:layout_width="fill_parent"
+        android:layout_height="@dimen/layout_height"
+        android:layout_gravity="center_horizontal"
+        android:checked="false"
+        android:text="@string/google_calendar"
+        android:textSize="@dimen/switch_text_size"
+        />
+
+
+    <Switch
+        android:id="@+id/switch_wunderlist"
+        android:layout_width="fill_parent"
+        android:layout_height="@dimen/layout_height"
+        android:layout_gravity="center_horizontal"
+        android:checked="false"
+        android:text="@string/wunderlist"
+        android:textSize="@dimen/switch_text_size" />
+
+    <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="0.10" />
@@ -65,8 +83,10 @@
             android:backgroundTint="@color/abc_search_url_text_pressed"
             android:checked="true"
             android:text="@string/yelp"
-            android:textSize="@dimen/switch_text_size" />
+            android:textSize="@dimen/switch_text_size"
+            />
 
+    />
         <Switch
             android:id="@+id/switch_google_places"
             android:layout_width="fill_parent"
@@ -74,7 +94,8 @@
             android:backgroundTint="@color/abc_search_url_text_pressed"
             android:checked="true"
             android:text="@string/google_places"
-            android:textSize="@dimen/switch_text_size" />
+            android:textSize="@dimen/switch_text_size"
+            />
 
         <TextView
             android:layout_width="wrap_content"
@@ -176,14 +197,14 @@
                 android:layout_alignParentLeft="true"
                 android:layout_below="@+id/refreshTextID"
                 android:layout_marginTop="10dp"
-                android:max="60"></SeekBar>
+                android:max="8"></SeekBar>
 
             <TextView
                 android:id="@+id/refreshFrontValueID"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/refreshSeekBarID"
-                android:text="1 min" />
+                android:text="0 hour" />
 
             <TextView
                 android:id="@+id/refreshCurrentValueID"
@@ -192,7 +213,7 @@
                 android:layout_alignWithParentIfMissing="true"
                 android:layout_below="@+id/refreshSeekBarID"
                 android:layout_centerHorizontal="true"
-                android:text="1 min" />
+                android:text="0 hour" />
 
 
             <TextView
@@ -201,7 +222,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_below="@+id/refreshSeekBarID"
-                android:text="60 min" />
+                android:text="8 hours" />
 
 
         </RelativeLayout>

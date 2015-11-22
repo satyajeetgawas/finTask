@@ -12,6 +12,8 @@ import com.appmagnet.fintaskanyplace.R;
 import com.appmagnet.fintaskanyplace.db.CategoryDBHelper;
 import com.appmagnet.fintaskanyplace.db.DBContract;
 import com.appmagnet.fintaskanyplace.util.ApiKeys;
+import com.appmagnet.fintaskanyplace.util.Util;
+import com.appmagnet.fintaskanyplace.wunderlist.WunderlistSession;
 import com.evernote.client.android.EvernoteSession;
 
 import java.io.BufferedReader;
@@ -38,7 +40,9 @@ public class Initializer extends Application {
     super.onCreate();
         //Set up the Evernote singleton session, use EvernoteSession.getInstance() later
         createEvernoteSession();
+        createWunderlistSession();
         generateCategoryDB();
+        Util.setApplicationContext(this);
 
 
 
@@ -79,6 +83,10 @@ public class Initializer extends Application {
 //                .setLocale(Locale.SIMPLIFIED_CHINESE)
                 .build(ApiKeys.EVERNOTE_CONSUMER_KEY, ApiKeys.EVERNOTE_CONSUMER_SECRET)
                 .asSingleton();
+    }
+
+    private void createWunderlistSession(){
+      new WunderlistSession.Builder(this).build(ApiKeys.CLIENT_ID,ApiKeys.CLIENT_SECRET,ApiKeys.REDIRECT_URI);
     }
 
     public Map read(){
