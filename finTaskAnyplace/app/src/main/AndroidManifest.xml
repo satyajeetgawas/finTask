@@ -39,7 +39,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.appmagnet.fintaskanyplace.activity.MainActivity" />
         </activity>
-        <activity android:name=".activity.SearchedResults"
+        <activity android:name=".activity.searchedResults"
             android:label="Nearby Places"
             android:parentActivityName=".activity.NotificationReciever" >
             <meta-data

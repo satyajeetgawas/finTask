@@ -110,7 +110,7 @@ public class NotificationReciever extends AppCompatActivity {
             toast +="\n "+busObj.getBusinessName();
         }
 
-        Intent intent = new Intent(getApplicationContext(), SearchedResults.class);
+        Intent intent = new Intent(getApplicationContext(), searchedResults.class);
         intent.putExtra(Constants.AFTER_NOTIFICATION_LIST, businessesList);
         intent.putExtra(Constants.CONTENTS_STRING, noteObj.getContents());
         //PendingIntent pIntent = PendingIntent.getActivity(getApplicationContext(), (int) System.currentTimeMillis(), intent, 0);

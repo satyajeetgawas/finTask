@@ -1,22 +1,17 @@
 package com.appmagnet.fintaskanyplace.core;
 
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.support.v4.app.NotificationCompat;
-import android.text.TextUtils;
-import android.widget.Toast;
 
 import com.appmagnet.fintaskanyplace.R;
-import com.appmagnet.fintaskanyplace.activity.MainActivity;
 import com.appmagnet.fintaskanyplace.activity.NotificationReciever;
-import com.appmagnet.fintaskanyplace.activity.SearchedResults;
+import com.appmagnet.fintaskanyplace.activity.searchedResults;
 import com.appmagnet.fintaskanyplace.dataobjects.BusinessObject;
 import com.appmagnet.fintaskanyplace.db.DBContract;
 import com.appmagnet.fintaskanyplace.db.NotesDBHelper;
@@ -27,12 +22,9 @@ import com.appmagnet.fintaskanyplace.util.Constants;
 import com.appmagnet.fintaskanyplace.util.Util;
 import com.appmagnet.fintaskanyplace.yelp.YelpAPI;
 
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
 
 /**
  * Created by satyajeet and anmol on 11/6/2015.
@@ -70,7 +62,7 @@ public class RunBusinessQuery extends AsyncTask<Object, Void, HashMap<String, Ar
             if(listener!=null)
                 listener.dismissProgress();
             if(mapOfBusinesses.get(category)!=null && context !=null){
-                Intent intent = new Intent(context.getApplicationContext(), SearchedResults.class);
+                Intent intent = new Intent(context.getApplicationContext(), searchedResults.class);
                 intent.putParcelableArrayListExtra(Constants.AFTER_NOTIFICATION_LIST, mapOfBusinesses.get(category));
                 intent.putExtra(Constants.CONTENTS_STRING, category);
                 context.startActivity(intent);

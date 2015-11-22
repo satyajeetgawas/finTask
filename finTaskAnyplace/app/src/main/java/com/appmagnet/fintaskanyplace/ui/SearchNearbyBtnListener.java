@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.view.View;
 
 import com.appmagnet.fintaskanyplace.R;
-import com.appmagnet.fintaskanyplace.activity.SearchedResults;
+import com.appmagnet.fintaskanyplace.activity.searchedResults;
 import com.appmagnet.fintaskanyplace.core.RunBusinessQuery;
 import com.appmagnet.fintaskanyplace.dataobjects.BusinessObject;
 import com.appmagnet.fintaskanyplace.dataobjects.NoteObject;
@@ -53,7 +53,7 @@ public class SearchNearbyBtnListener implements View.OnClickListener {
                 businessesList.addAll(addList);
 
             }
-            Intent intent = new Intent(context.getApplicationContext(), SearchedResults.class);
+            Intent intent = new Intent(context.getApplicationContext(), searchedResults.class);
             intent.putParcelableArrayListExtra(Constants.AFTER_NOTIFICATION_LIST, businessesList);
             intent.putExtra(Constants.CONTENTS_STRING, category);
             context.startActivity(intent);
