@@ -122,11 +122,11 @@ public class RunBusinessQuery extends AsyncTask<Object, Void, HashMap<String, Ar
                             continue;
                         if (Boolean.parseBoolean(Util.getSettings(context, Constants.YELP_PREF))) {
                             YelpAPI yelpApi = new YelpAPI();
-                            listOfBusinesses.addAll(yelpApi.searchForBusinessesByLocation(term, location));
+                            listOfBusinesses.addAll(yelpApi.searchForBusinessesByLocation(term, location, context));
                         }
                         if (Boolean.parseBoolean(Util.getSettings(context, Constants.GOOGLE_PLACES_PREF))) {
                             GooglePlacesApi googlePlaces = new GooglePlacesApi();
-                            listOfBusinesses.addAll(googlePlaces.searchForBusinessesByLocation(term, location));
+                            listOfBusinesses.addAll(googlePlaces.searchForBusinessesByLocation(term, location, context));
                         }
 
                         if (listOfBusinesses.size() > 0) {

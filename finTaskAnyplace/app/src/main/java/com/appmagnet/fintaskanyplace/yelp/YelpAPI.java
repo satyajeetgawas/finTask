@@ -1,5 +1,7 @@
 package com.appmagnet.fintaskanyplace.yelp;
 
+import android.content.Context;
+
 import com.appmagnet.fintaskanyplace.dataobjects.BusinessObject;
 import com.appmagnet.fintaskanyplace.util.ApiKeys;
 import com.appmagnet.fintaskanyplace.util.Util;
@@ -57,12 +59,12 @@ public class YelpAPI {
      * @param location <tt>String</tt> of the location
      * @return <tt>String</tt> JSON Response
      */
-    public ArrayList<BusinessObject> searchForBusinessesByLocation(String term, String location) {
+    public ArrayList<BusinessObject> searchForBusinessesByLocation(String term, String location, Context context) {
         OAuthRequest request = createOAuthRequest(SEARCH_PATH);
         request.addQuerystringParameter("term", term);
         request.addQuerystringParameter("ll", location);
         request.addQuerystringParameter("limit", Util.getSearchLimit());
-        request.addQuerystringParameter("radius_limit", Util.getRadius());
+        request.addQuerystringParameter("radius_limit", Util.getRadius(context));
         String responseJsonString = sendRequestAndGetResponse(request);
         return getBusinessObjectsFromJson(responseJsonString,term);
     }
