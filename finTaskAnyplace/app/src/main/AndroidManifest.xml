@@ -44,14 +44,8 @@
             android:parentActivityName=".activity.NotificationReciever" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.appmagnet.fintaskanyplace.activity.MainActivity" />
+                android:value="com.appmagnet.fintaskanyplace.activity.NotificationReciever" />
         </activity>
-        <activity android:name=".wunderlist.LoginPageActivity"
-            android:label="Wunderlist Login
-            "
-            android:parentActivityName=".activity.SettingsActivity" >
-        </activity>
-
         <!-- Broadcast receiver -->
     <receiver   android:name=".backgroundtasks.BackgroundTaskReceiver"></receiver>
 

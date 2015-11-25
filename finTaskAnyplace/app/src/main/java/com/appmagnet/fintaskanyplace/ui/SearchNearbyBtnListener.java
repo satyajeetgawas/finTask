@@ -46,7 +46,7 @@ public class SearchNearbyBtnListener implements View.OnClickListener {
                 ArrayList addList = new ArrayList();
                 for (BusinessObject busObj : businessesList) {
 
-                    if (busObj.getBusinessCategory().equals(category))
+                    if (busObj.getBusinessCategory().equals(noteObj.getContents()))
                         addList.add(busObj);
                 }
                 businessesList.clear();

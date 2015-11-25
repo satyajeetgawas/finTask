@@ -25,6 +25,7 @@ import com.appmagnet.fintaskanyplace.util.Constants;
 import com.appmagnet.fintaskanyplace.util.Util;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 /**
@@ -41,6 +42,7 @@ public class searchedResults extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.search_results);
         businessList = (ArrayList)getIntent().getParcelableArrayListExtra(Constants.AFTER_NOTIFICATION_LIST);
+        Collections.sort(businessList);
         items = (String)getIntent().getStringExtra(Constants.CONTENTS_STRING);
         list = (ListView)findViewById(R.id.list_search);
         list.setAdapter(new ListViewAdapter(this,businessList));

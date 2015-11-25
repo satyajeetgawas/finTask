@@ -16,7 +16,6 @@ import com.appmagnet.fintaskanyplace.util.Util;
  */
 public class BackgroundTaskReceiver extends BroadcastReceiver {
 
-
     @Override
     public void onReceive(final Context context, Intent intent) {
         PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
@@ -28,14 +27,10 @@ public class BackgroundTaskReceiver extends BroadcastReceiver {
         wl.release();
     }
 
-
-
     public void doInBackground(Context context) {
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, BackgroundTaskReceiver.class);
         PendingIntent pi = PendingIntent.getBroadcast(context, 0, intent, 0);
         am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), Util.getRefreshRate(context), pi);
     }
-
-
 }

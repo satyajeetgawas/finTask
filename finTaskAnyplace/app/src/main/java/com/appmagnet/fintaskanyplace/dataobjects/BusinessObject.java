@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * Created by satyajeet and anmol on 11/6/2015.
  */
-public class BusinessObject implements Parcelable {
+public class BusinessObject implements Parcelable ,Comparable<BusinessObject> {
 
     public static final String NAME = "NAME";
     public static final String RATING = "RATING";
@@ -85,5 +85,10 @@ public class BusinessObject implements Parcelable {
         parcel.writeString(getBusinessCategory());
         //parcel.writeString(getBusinessItems());
 
+    }
+
+    @Override
+    public int compareTo(BusinessObject o) {
+        return (int)(Float.parseFloat(o.getBusinessRating())*10 - Float.parseFloat(getBusinessRating())*10);
     }
 }

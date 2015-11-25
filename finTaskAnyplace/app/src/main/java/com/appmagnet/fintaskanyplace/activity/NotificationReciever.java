@@ -26,7 +26,7 @@ import java.util.List;
  */
 public class NotificationReciever extends AppCompatActivity {
 
-    private HashMap<String, ArrayList> mapOfBusiness;
+    private static HashMap<String, ArrayList>  mapOfBusiness;
     ExpandableListAdapter listAdapter;
     ExpandableListView expListView;
     List<String> listDataHeader;
@@ -36,10 +36,12 @@ public class NotificationReciever extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.result);
-
-        mapOfBusiness = (HashMap<String, ArrayList>)getIntent().getSerializableExtra(Constants.LIST_OF_PLACES);
+        if(mapOfBusiness == null)
+            mapOfBusiness = (HashMap<String, ArrayList>)getIntent().getSerializableExtra(Constants.LIST_OF_PLACES);
         showPostDBWrite();
     }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
@@ -136,32 +138,34 @@ public class NotificationReciever extends AppCompatActivity {
         listDataChild = new HashMap<String, List<NoteObject>>();
 
         ArrayList listOfCategories = new ArrayList<>();
-        ArrayList listOfBusiness = new ArrayList<>();
         for (HashMap.Entry<String, ArrayList> entry : mapOfBusiness.entrySet()) {
-            listOfBusiness = entry.getValue();
-
             listOfCategories.add(entry.getKey());
-            //for(Object businessObject : listOfBusiness){
-            //    String temp = ((BusinessObject)businessObject).getBusinessName()+" "+((BusinessObject)businessObject).getBusinessRating();
-            //    listOfPlaces.add(temp);
-
-            //}
         }
 
         if (c.moveToFirst()) {
             do {
                 NoteObject obj = new NoteObject(c);
+                boolean shouldAdd = true;
+                if (listOfCategories.contains(obj.getNoteType())) {
+                    ArrayList listOfNoteObj = (ArrayList) listDataChild.get(obj.getNoteType());
+                    if (obj.getNoteType().equals(Constants.UNCATEGORIZED)) {
+                        ArrayList busList = new ArrayList();
+                        ArrayList<BusinessObject> uncatList = mapOfBusiness.get(Constants.UNCATEGORIZED);
+                        for (BusinessObject busObj : uncatList) {
+                            if (busObj.getBusinessCategory().equals(obj.getContents()))
+                                busList.add(busObj);
+                        }
+                        if (busList.size() == 0)
+                            shouldAdd = false;
 
-                if( listOfCategories.contains(obj.getNoteType()) ) {
-                    if (listDataChild.get(obj.getNoteType()) == null) {
-                        ArrayList listOfNoteObj = new ArrayList();
-                        listOfNoteObj.add(obj);
+                    }
+                    if (listOfNoteObj == null && shouldAdd) {
+                        listOfNoteObj = new ArrayList();
                         listDataHeader.add(obj.getNoteType());
+                    }
+                    if(shouldAdd) {
+                        listOfNoteObj.add(obj);
                         listDataChild.put(obj.getNoteType(), listOfNoteObj);
-                    } else {
-                        ArrayList list = (ArrayList) listDataChild.get(obj.getNoteType());
-                        list.add(obj);
-                        listDataChild.put(obj.getNoteType(), list);
                     }
                 }
             }

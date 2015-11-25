@@ -47,15 +47,12 @@ public class RunBusinessQuery extends AsyncTask<Object, Void, HashMap<String, Ar
             skipGoogle = (boolean)params[2];
             listener = (SearchNearbyBtnListener)params[3];
         }
-
-
         return runTheSearchQuery();
     }
 
     @Override
     protected void onPostExecute(HashMap<String,ArrayList> mapOfBusinesses) {
          //for debuging later create a notification
-
         if ( mapOfBusinesses.size()>0 && isForNotification) {
             createNotification(mapOfBusinesses);
         }else if(!isForNotification){
@@ -67,17 +64,13 @@ public class RunBusinessQuery extends AsyncTask<Object, Void, HashMap<String, Ar
                 intent.putExtra(Constants.CONTENTS_STRING, category);
                 context.startActivity(intent);
             }
-
         }
-
     }
 
     private HashMap runTheSearchQuery() {
 
         LocationHandler lh = LocationHandler.getInstance();
         HashMap categoryBusMap = new HashMap<String, ArrayList>();
-
-
 
         if (lh != null && lh.isLocationEnabled()) {
             if (lh.getLocationMap().get(LocationHandler.LATITUDE) != null) {
@@ -86,18 +79,16 @@ public class RunBusinessQuery extends AsyncTask<Object, Void, HashMap<String, Ar
                 location += ",";
                 location += lh.getLocationMap().get(LocationHandler.LONGITUDE).toString();
 
-
                 if(!isForNotification){
                     ArrayList<BusinessObject> listOfBusinesses = new ArrayList<BusinessObject>();
                     if (Boolean.parseBoolean(Util.getSettings(context, Constants.YELP_PREF))) {
                         YelpAPI yelpApi = new YelpAPI();
-                        listOfBusinesses.addAll(yelpApi.searchForBusinessesByLocation(category, location));
+                        listOfBusinesses.addAll(yelpApi.searchForBusinessesByLocation(category, location,context));
                     }
                     if (Boolean.parseBoolean(Util.getSettings(context, Constants.GOOGLE_PLACES_PREF)) && !skipGoogle) {
                         GooglePlacesApi googlePlaces = new GooglePlacesApi();
-                        listOfBusinesses.addAll(googlePlaces.searchForBusinessesByLocation(category, location));
+                        listOfBusinesses.addAll(googlePlaces.searchForBusinessesByLocation(category, location,context));
                     }
-
                     if (listOfBusinesses.size() > 0) {
                         filterBusiness(listOfBusinesses);
                         categoryBusMap.put(category, listOfBusinesses);
@@ -105,12 +96,9 @@ public class RunBusinessQuery extends AsyncTask<Object, Void, HashMap<String, Ar
                     return categoryBusMap;
                 }
 
-
                 NotesDBHelper mDbHelper = new NotesDBHelper(context);
                 SQLiteDatabase db = mDbHelper.getWritableDatabase();
                 Cursor c = db.rawQuery("SELECT DISTINCT category FROM Notes", null);
-                //String term = "grocery_or_supermarket"; //this term will be obtained from the saved(cached) file which is
-                //generated or refreshed once daily
 
                 if (c.moveToFirst()) {
                     do {
@@ -133,12 +121,10 @@ public class RunBusinessQuery extends AsyncTask<Object, Void, HashMap<String, Ar
                             filterBusiness(listOfBusinesses);
                             categoryBusMap.put(term, listOfBusinesses);
                         }
-
                     } while (c.moveToNext());
-
                 }
-
                 c.close();
+
                 c = db.rawQuery("SELECT * FROM " + DBContract.NotesEntry.TABLE_NAME
                         + " WHERE " + DBContract.NotesEntry.COLUMN_CATEGORY
                         + " = '" + Constants.UNCATEGORIZED + "'", null);
@@ -157,7 +143,7 @@ public class RunBusinessQuery extends AsyncTask<Object, Void, HashMap<String, Ar
                                 if (s != null) {
                                     if (Boolean.parseBoolean(Util.getSettings(context, Constants.YELP_PREF))) {
                                         YelpAPI yelpApi = new YelpAPI();
-                                        listOfBusinesses.addAll(yelpApi.searchForBusinessesByLocation(s, location));
+                                        listOfBusinesses.addAll(yelpApi.searchForBusinessesByLocation(s, location,context));
                                     }
                                 }
                             }
@@ -170,7 +156,6 @@ public class RunBusinessQuery extends AsyncTask<Object, Void, HashMap<String, Ar
                 }
             }
         }
-
         return categoryBusMap;
     }
 
@@ -209,5 +194,4 @@ public class RunBusinessQuery extends AsyncTask<Object, Void, HashMap<String, Ar
         noti.setAutoCancel(true);
         notificationManager.notify(0, noti.build());
     }
-
 }
