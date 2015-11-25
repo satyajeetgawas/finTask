@@ -44,48 +44,6 @@ public class searchedResults extends AppCompatActivity {
         items = (String)getIntent().getStringExtra(Constants.CONTENTS_STRING);
         list = (ListView)findViewById(R.id.list_search);
         list.setAdapter(new ListViewAdapter(this,businessList));
-        //setListViewHeightBasedOnItems(list);
-    }
-
-
-
-
-    private void startSettingsActivity(){
-        Intent intent = new Intent(this,SettingsActivity.class);
-        startActivity(intent);
-    }
-
-    public static boolean setListViewHeightBasedOnItems(ListView listView) {
-
-        ListAdapter listAdapter = listView.getAdapter();
-        if (listAdapter != null) {
-
-            int numberOfItems = listAdapter.getCount();
-
-            // Get total height of all items.
-            int totalItemsHeight = 0;
-            for (int itemPos = 0; itemPos < numberOfItems; itemPos++) {
-                View item = listAdapter.getView(itemPos, null, listView);
-                item.measure(0, 0);
-                totalItemsHeight += item.getMeasuredHeight();
-            }
-
-            // Get total height of all item dividers.
-            int totalDividersHeight = listView.getDividerHeight() *
-                    (numberOfItems - 1);
-
-            // Set list height.
-            ViewGroup.LayoutParams params = listView.getLayoutParams();
-            params.height = totalItemsHeight + totalDividersHeight;
-            listView.setLayoutParams(params);
-            listView.requestLayout();
-
-            return true;
-
-        } else {
-            return false;
-        }
-
     }
 
     public void startMaps(BusinessObject businessObject){
@@ -93,7 +51,7 @@ public class searchedResults extends AppCompatActivity {
                 Uri.parse("http://maps.google.com/maps?saddr=" + LocationHandler.getInstance().getLocationMap().get(LocationHandler.LATITUDE)
                                 + "," + LocationHandler.getInstance().getLocationMap().get(LocationHandler.LONGITUDE) +"&daddr="+
                                 businessObject.getBusinessLatitude()+","+businessObject.getBusinessLongitude()));
-                        startActivity(intent);
+        startActivity(intent);
     }
 
 }
