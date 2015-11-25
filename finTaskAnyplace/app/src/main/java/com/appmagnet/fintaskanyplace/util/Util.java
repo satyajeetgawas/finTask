@@ -27,7 +27,7 @@ import java.util.List;
 public final class Util {
 
 
-    private static String PROXIMITY_RADIUS_VAL = "2000";
+    private static int PROXIMITY_RADIUS_VAL = 2;
     private static int REFRESH_RATE_HOURS = 4;
     private static String SEARCH_LIMIT = "10";
     public static List<String> listDataHeader;
@@ -41,8 +41,18 @@ public final class Util {
         return SEARCH_LIMIT;
     }
 
-    public static String getRadius(){
-        return PROXIMITY_RADIUS_VAL;
+    public static String getRadius(Context context){
+        String radius_string = getSettings(context,Constants.PROXIMITY_RADIUS);
+        int radiusInMiles = PROXIMITY_RADIUS_VAL;
+        long radius;
+        if(radius_string != null)
+            radiusInMiles = Integer.parseInt(radius_string);
+        radius = radiusInMiles*1609;
+        String radi = String.valueOf(radius);
+        //REFRESH_RATE = 1000*30;
+        //return REFRESH_RATE;
+        return radi;
+        //return PROXIMITY_RADIUS_VAL;
     }
 
 

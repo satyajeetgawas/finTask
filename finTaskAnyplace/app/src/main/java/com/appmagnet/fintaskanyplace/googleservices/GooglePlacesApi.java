@@ -1,6 +1,8 @@
 package com.appmagnet.fintaskanyplace.googleservices;
 
 
+import android.content.Context;
+
 import com.appmagnet.fintaskanyplace.dataobjects.BusinessObject;
 import com.appmagnet.fintaskanyplace.util.ApiKeys;
 import com.appmagnet.fintaskanyplace.util.Util;
@@ -25,13 +27,13 @@ import java.util.Map;
  */
 public class GooglePlacesApi {
 
-    public ArrayList<BusinessObject> searchForBusinessesByLocation(String term, String location) {
+    public ArrayList<BusinessObject> searchForBusinessesByLocation(String term, String location, Context context) {
 
         StringBuilder urlString = new StringBuilder(
                 "https://maps.googleapis.com/maps/api/place/search/json?");
         urlString.append("&types=" + term);
         urlString.append("&location=" + location);
-        urlString.append("&radius=" + Util.getRadius());
+        urlString.append("&radius=" + Util.getRadius(context));
       //  urlString.append("&opennow");
         urlString.append("&sensor=false");
         urlString.append("&key=" + ApiKeys.GOOGLE_API_KEY);
