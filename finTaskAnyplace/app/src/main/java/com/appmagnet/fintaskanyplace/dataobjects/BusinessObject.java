@@ -16,6 +16,7 @@ public class BusinessObject implements Parcelable ,Comparable<BusinessObject> {
     public static final String LATITUDE = "lat";
     public static final String LONGITUDE = "lng";
     public static final String CATEGORY = "cat";
+    public static final String DISTANCE = "dist";
     //public static final String ITEMS = "items";
 
    private Map<String,String> businessProperties;
@@ -34,6 +35,7 @@ public class BusinessObject implements Parcelable ,Comparable<BusinessObject> {
             prop.put(LATITUDE,in.readString());
             prop.put(LONGITUDE,in.readString());
             prop.put(CATEGORY,in.readString());
+            prop.put(DISTANCE,in.readString());
             //prop.put(ITEMS,in.readString());
             return new BusinessObject(prop);
         }
@@ -64,6 +66,10 @@ public class BusinessObject implements Parcelable ,Comparable<BusinessObject> {
         return businessProperties.get(CATEGORY);
     }
 
+    public String getBusinessDistance(){
+        return businessProperties.get(DISTANCE);
+    }
+
     //public String getBusinessItems() { return businessProperties.get(ITEMS);}
 
     public Map<String,String> getBusinessProperties(){
@@ -83,6 +89,7 @@ public class BusinessObject implements Parcelable ,Comparable<BusinessObject> {
         parcel.writeString(getBusinessLatitude());
         parcel.writeString(getBusinessLongitude());
         parcel.writeString(getBusinessCategory());
+        parcel.writeString(getBusinessDistance());
         //parcel.writeString(getBusinessItems());
 
     }

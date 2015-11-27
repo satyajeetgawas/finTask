@@ -3,6 +3,7 @@ package com.appmagnet.fintaskanyplace.yelp;
 import android.content.Context;
 
 import com.appmagnet.fintaskanyplace.dataobjects.BusinessObject;
+import com.appmagnet.fintaskanyplace.googleservices.GoogleMapsApi;
 import com.appmagnet.fintaskanyplace.util.ApiKeys;
 import com.appmagnet.fintaskanyplace.util.Util;
 
@@ -66,10 +67,10 @@ public class YelpAPI {
         request.addQuerystringParameter("limit", Util.getSearchLimit());
         request.addQuerystringParameter("radius_limit", Util.getRadius(context));
         String responseJsonString = sendRequestAndGetResponse(request);
-        return getBusinessObjectsFromJson(responseJsonString,term);
+        return getBusinessObjectsFromJson(responseJsonString,term, location);
     }
 
-    private ArrayList<BusinessObject> getBusinessObjectsFromJson(String responseJsonString, String cat ) {
+    private ArrayList<BusinessObject> getBusinessObjectsFromJson(String responseJsonString, String cat, String user_location ) {
         ArrayList<BusinessObject> listPlaces = null;
         JSONObject json = null;
         JSONArray businesses = null;
@@ -92,6 +93,10 @@ public class YelpAPI {
                     busProp.put(BusinessObject.CATEGORY,cat);
                     //busProp.put(BusinessObject.ITEMS,items);
            //         business.getString("location.coordinate.longitude"));
+                    String dest_location = business.getJSONObject("location").getJSONObject("coordinate").getString("latitude") + ","+business.getJSONObject("location").getJSONObject("coordinate").getString("longitude");
+                    GoogleMapsApi googleMaps = new GoogleMapsApi();
+                    String distance = googleMaps.getDistanceFromUser(user_location, dest_location);
+                    busProp.put(BusinessObject.DISTANCE, distance);
                     listPlaces.add(new BusinessObject(busProp));
                 } catch (JSONException e) {
                     e.printStackTrace();

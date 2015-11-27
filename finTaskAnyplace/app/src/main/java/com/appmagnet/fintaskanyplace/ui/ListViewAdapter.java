@@ -37,7 +37,8 @@ public class ListViewAdapter extends ArrayAdapter {
         ImageButton button = (ImageButton) rowView.findViewById(R.id.open_in_maps);
         button.setOnClickListener(new OpenInMapListener(context,listOfBusinessObjects.get(position)));
         String text = "<html><b>"+ listOfBusinessObjects.get(position).getBusinessName()+"</b><br>"+
-                listOfBusinessObjects.get(position).getBusinessRating()+" Stars</html>";
+                listOfBusinessObjects.get(position).getBusinessRating()+" Stars<br>"+
+                listOfBusinessObjects.get(position).getBusinessDistance()+"</html>";
         businessView.setText(Html.fromHtml(text));
 
 
