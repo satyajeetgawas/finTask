@@ -24,8 +24,8 @@ public class GoogleMapsApi {
     public String getDistanceFromUser(String user_loc, String dest_loc) {
         StringBuilder urlString = new StringBuilder(
                 "https://maps.googleapis.com/maps/api/distancematrix/json?");
-        urlString.append("&origin=" + user_loc);
-        urlString.append("&destination=" + dest_loc);
+        urlString.append("&origins=" + user_loc);
+        urlString.append("&destinations=" + dest_loc);
         urlString.append("&units=imperial");
         urlString.append("&sensor=false");
         //  urlString.append("&opennow");
@@ -62,24 +62,13 @@ public class GoogleMapsApi {
 
     private String getDistanceFromJson(String jsonResponse) {
         String Distance = "";
-        ArrayList<String> listDistances;
-        JSONObject json = null;
-        JSONArray results = new JSONArray();
         try {
-            json = new JSONObject(jsonResponse);
-            results = json.getJSONArray("results");
+            JSONArray rows = new JSONObject(jsonResponse).getJSONArray("rows");
+            Distance = rows.getJSONObject(0).getJSONArray("elements").getJSONObject(0).getJSONObject("distance").getString("text");
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        try {
-                JSONObject distance = results.getJSONObject(0);
-                Distance = distance.getJSONObject("distance").getString("text");
-                //busProp.put(BusinessObject.ITEMS,items)
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-        return Distance;
+       return Distance.replace("mi","miles");
     }
 }
