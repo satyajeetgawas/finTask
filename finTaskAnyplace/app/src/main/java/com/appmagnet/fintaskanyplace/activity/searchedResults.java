@@ -42,10 +42,20 @@ public class searchedResults extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.search_results);
         businessList = (ArrayList)getIntent().getParcelableArrayListExtra(Constants.AFTER_NOTIFICATION_LIST);
-        Collections.sort(businessList);
+
         items = (String)getIntent().getStringExtra(Constants.CONTENTS_STRING);
         list = (ListView)findViewById(R.id.list_search);
-        list.setAdapter(new ListViewAdapter(this,businessList));
+        ArrayList<BusinessObject> addPlaces = new ArrayList<>();
+        for(int i=0;i<businessList.size();i++){
+            String distStr =  businessList.get(i).getBusinessDistance().replace("miles","");
+            if(!distStr.equals("") && !distStr.isEmpty()){
+                Double  distance =new Double(distStr.trim());
+                if(distance < new Double((Util.getSettings(this, Constants.PROXIMITY_RADIUS))))
+                    addPlaces.add(businessList.get(i));
+            }
+
+        }
+        list.setAdapter(new ListViewAdapter(this,addPlaces));
     }
 
     public void startMaps(BusinessObject businessObject){

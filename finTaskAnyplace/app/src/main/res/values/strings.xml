@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name"><i>fin</i>TaskAnyplace</string>
+    <string name="app_name"><i>fin</i>Task</string>
 
     <string name="loading_title">Loading</string>
     <string name="loading_content">Generating Task List</string>

@@ -15,6 +15,7 @@ import com.appmagnet.fintaskanyplace.activity.searchedResults;
 import com.appmagnet.fintaskanyplace.dataobjects.BusinessObject;
 import com.appmagnet.fintaskanyplace.db.DBContract;
 import com.appmagnet.fintaskanyplace.db.NotesDBHelper;
+import com.appmagnet.fintaskanyplace.googleservices.GoogleMapsApi;
 import com.appmagnet.fintaskanyplace.googleservices.GooglePlacesApi;
 import com.appmagnet.fintaskanyplace.initializer.LocationHandler;
 import com.appmagnet.fintaskanyplace.ui.SearchNearbyBtnListener;
@@ -24,6 +25,7 @@ import com.appmagnet.fintaskanyplace.yelp.YelpAPI;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 
 /**
@@ -34,6 +36,7 @@ public class RunBusinessQuery extends AsyncTask<Object, Void, HashMap<String, Ar
     String category;
     boolean isForNotification = true;
     boolean skipGoogle = false;
+    private String location;
     private SearchNearbyBtnListener listener;
 
 
@@ -74,7 +77,6 @@ public class RunBusinessQuery extends AsyncTask<Object, Void, HashMap<String, Ar
 
         if (lh != null && lh.isLocationEnabled()) {
             if (lh.getLocationMap().get(LocationHandler.LATITUDE) != null) {
-                String location;
                 location = lh.getLocationMap().get(LocationHandler.LATITUDE).toString();
                 location += ",";
                 location += lh.getLocationMap().get(LocationHandler.LONGITUDE).toString();
@@ -174,6 +176,19 @@ public class RunBusinessQuery extends AsyncTask<Object, Void, HashMap<String, Ar
                 }
             }
         }
+        Collections.sort(listOfBusinesses);
+        if(listOfBusinesses.size()>7) {
+            int i = 7;
+            while (listOfBusinesses.size() > 7) {
+                listOfBusinesses.remove(i);
+            }
+        }
+        for(BusinessObject busObj:listOfBusinesses){
+            String dest_location =busObj.getBusinessLatitude() + ","+busObj.getBusinessLongitude();
+            GoogleMapsApi googleMaps = new GoogleMapsApi();
+            String distance = googleMaps.getDistanceFromUser(location, dest_location);
+            busObj.getBusinessProperties().put(BusinessObject.DISTANCE, distance);
+        }
     }
 
     private void createNotification(HashMap mapOfBusinessPlaces) {
@@ -186,8 +201,8 @@ public class RunBusinessQuery extends AsyncTask<Object, Void, HashMap<String, Ar
         // Build notification
         // Actions are just fake
         NotificationCompat.Builder noti = new NotificationCompat.Builder(context)
-                .setContentTitle("finTaskAnyplace")
-                .setContentText(context.getString(R.string.notification_msg)).setSmallIcon(R.drawable.evernote)
+                .setContentTitle("finTask")
+                .setContentText(context.getString(R.string.notification_msg)).setSmallIcon(R.drawable.notification_icon)
                 .setContentIntent(pIntent);
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
         // hide the notification after its selected

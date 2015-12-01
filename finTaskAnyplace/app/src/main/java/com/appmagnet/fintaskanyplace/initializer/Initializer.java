@@ -61,8 +61,8 @@ public class Initializer extends Application {
                 ArrayList<String> mappedItems = entry.getValue();
                 for (String item : mappedItems) {
                     ContentValues values = new ContentValues();
-                    values.put(DBContract.CategoryEntry.COLUMN_CATEGORY, key.trim());
-                    values.put(DBContract.CategoryEntry.COLUMN_CONTENTS, item.trim());
+                    values.put(DBContract.CategoryEntry.COLUMN_CATEGORY, key.replace(" ","").trim());
+                    values.put(DBContract.CategoryEntry.COLUMN_CONTENTS, item.replace(" ","").trim());
                     db.insert(DBContract.CategoryEntry.TABLE_NAME, null, values);
                 }
             }

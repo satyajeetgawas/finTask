@@ -93,10 +93,7 @@ public class YelpAPI {
                     busProp.put(BusinessObject.CATEGORY,cat);
                     //busProp.put(BusinessObject.ITEMS,items);
            //         business.getString("location.coordinate.longitude"));
-                    String dest_location = business.getJSONObject("location").getJSONObject("coordinate").getString("latitude") + ","+business.getJSONObject("location").getJSONObject("coordinate").getString("longitude");
-                    GoogleMapsApi googleMaps = new GoogleMapsApi();
-                    String distance = googleMaps.getDistanceFromUser(user_location, dest_location);
-                    busProp.put(BusinessObject.DISTANCE, distance);
+
                     listPlaces.add(new BusinessObject(busProp));
                 } catch (JSONException e) {
                     e.printStackTrace();

@@ -88,11 +88,6 @@ public class GooglePlacesApi {
                 busProp.put(BusinessObject.LATITUDE, business.getJSONObject("geometry").getJSONObject("location").getString("lat"));
                 busProp.put(BusinessObject.LONGITUDE, business.getJSONObject("geometry").getJSONObject("location").getString("lng"));
                 busProp.put(BusinessObject.CATEGORY,term);
-                String dest_location = business.getJSONObject("geometry").getJSONObject("location").getString("lat") + ","+business.getJSONObject("geometry").getJSONObject("location").getString("lng");
-                GoogleMapsApi googleMaps = new GoogleMapsApi();
-                String distance = googleMaps.getDistanceFromUser(user_location, dest_location);
-                busProp.put(BusinessObject.DISTANCE, distance);
-                //busProp.put(BusinessObject.ITEMS,items);
                 listPlaces.add(new BusinessObject(busProp));
             } catch (JSONException e) {
                 e.printStackTrace();

@@ -11,6 +11,8 @@ import android.widget.TextView;
 
 import com.appmagnet.fintaskanyplace.R;
 import com.appmagnet.fintaskanyplace.dataobjects.BusinessObject;
+import com.appmagnet.fintaskanyplace.util.Constants;
+import com.appmagnet.fintaskanyplace.util.Util;
 
 import java.util.ArrayList;
 
@@ -26,6 +28,8 @@ public class ListViewAdapter extends ArrayAdapter {
         super(context,-1,businessObjects);
         this.context = context;
         this.listOfBusinessObjects = businessObjects;
+
+
     }
 
     @Override
@@ -36,13 +40,12 @@ public class ListViewAdapter extends ArrayAdapter {
         TextView businessView = (TextView) rowView.findViewById(R.id.business_text);
         ImageButton button = (ImageButton) rowView.findViewById(R.id.open_in_maps);
         button.setOnClickListener(new OpenInMapListener(context,listOfBusinessObjects.get(position)));
-        String text = "<html><b>"+ listOfBusinessObjects.get(position).getBusinessName()+"</b><br>"+
-                listOfBusinessObjects.get(position).getBusinessRating()+" Stars<br>"+
-                listOfBusinessObjects.get(position).getBusinessDistance()+"</html>";
-        businessView.setText(Html.fromHtml(text));
 
+            String text = "<html><b>"+ listOfBusinessObjects.get(position).getBusinessName()+"</b><br>"+
+                    listOfBusinessObjects.get(position).getBusinessRating()+" Stars<br>"+
+                    listOfBusinessObjects.get(position).getBusinessDistance()+"</html>";
+            businessView.setText(Html.fromHtml(text));
 
-
-        return rowView;
+    return rowView;
     }
 }

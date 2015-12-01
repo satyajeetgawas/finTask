@@ -39,6 +39,7 @@ public class EvernoteReadUserNotes {
     final static String TODO_TAG_CLOSE = "</en-todo>";
     final static String DIV = "<div>";
     final static String DIV_END = "</div>";
+    final static String NEW_LINE1 = "<br clear=\"none\"/>";
     final static String NEW_LINE = "<div><br clear=\"none\"/></div>";
 
     public EvernoteReadUserNotes() {
@@ -76,6 +77,7 @@ public class EvernoteReadUserNotes {
             noteData = noteData.replaceAll(NEW_LINE, "");
             noteData = noteData.replaceAll(DIV, "");
             noteData = noteData.replaceAll(DIV_END, ",");
+            noteData = noteData.replaceAll(NEW_LINE1,",");
             notesData.put(guid, noteData);
 
         }
